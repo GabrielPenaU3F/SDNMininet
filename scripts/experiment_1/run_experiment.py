@@ -1,36 +1,17 @@
 import numpy as np
 
-from mininet.net import Mininet
-from mininet.node import RemoteController
 
-from scripts.common.controller_management import stop_controller, start_controller
 from scripts.common.environment import Environment
+from scripts.common.experiment_management import shutdown_experiment, begin_experiment
 from topologies.test_topologies import AwadDDoSTopology
 
 env = Environment.get_environment()
-ryu = start_controller("controllers/first_measurement_controller/controller.py")
 
-topo = AwadDDoSTopology()
-
-net = Mininet(
-    topo=topo,
-    controller=None,
-    autoSetMacs=False
-)
-
-net.addController(
-    "c0",
-    controller=RemoteController,
-    ip="127.0.0.1",
-    port=6633
-)
-
-net.start()
+net, ryu = begin_experiment(controller_path="controllers/first_measurement_controller/controller.py",
+                            topology_cls=AwadDDoSTopology)
 
 h1 = net["h1"]
 h2 = net["h2"]
-
-basepath = '/home/sskies/SDN/scripts/experiment_1'
 
 rate_1, rate_2 = np.random.uniform(0, 10, 2)
 
@@ -53,5 +34,5 @@ h2.popen([
 env=env)
 
 input("Presione ENTER para finalizar...")
-net.stop()
-stop_controller(ryu)
+
+shutdown_experiment(net, ryu)
