@@ -1,29 +1,14 @@
-import os
-import subprocess
-import time
-
 import numpy as np
 
-from pathlib import Path
 from mininet.net import Mininet
 from mininet.node import RemoteController
-from mininet.clean import cleanup
 
+from scripts.common.controller_management import stop_controller, start_controller
+from scripts.common.environment import Environment
 from topologies.test_topologies import AwadDDoSTopology
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-env = os.environ.copy()
-env["PYTHONPATH"] = str(PROJECT_ROOT)
-
-cleanup()
-
-ryu = subprocess.Popen(
-    [
-        "/home/sskies/SDN/.venv/bin/ryu-manager",
-        "controllers/first_measurement_controller/controller.py"
-    ], env=env
-)
-time.sleep(2)
+env = Environment.get_environment()
+ryu = start_controller("controllers/first_measurement_controller/controller.py")
 
 topo = AwadDDoSTopology()
 
@@ -69,5 +54,4 @@ env=env)
 
 input("Presione ENTER para finalizar...")
 net.stop()
-ryu.terminate()
-ryu.wait()
+stop_controller(ryu)

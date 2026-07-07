@@ -1,18 +1,21 @@
+import csv
+import time
 from typing import Any
 
 from ryu.base import app_manager
 from ryu.controller import ofp_event
 
 from ryu.controller.handler import set_ev_cls, CONFIG_DISPATCHER, MAIN_DISPATCHER
+from ryu.lib import hub
 from ryu.lib.packet import ethernet
 from ryu.lib.packet.packet import Packet
 from ryu.ofproto import ofproto_v1_3
 
-from controllers.test_controller.packetin_rules import install_port_to_mac_rule
-from controllers.test_controller.setup_rules import install_send_everything_to_controller_rule
+from controllers.rules.packetin_rules import install_port_to_mac_rule
+from controllers.rules.setup_rules import install_send_everything_to_controller_rule, install_discard_ipv6_traffic_rule
 
 
-class TestController(app_manager.RyuApp):
+class FirstMeasurementController(app_manager.RyuApp):
 
     OFP_VERSIONS = [
         ofproto_v1_3.OFP_VERSION
@@ -22,6 +25,22 @@ class TestController(app_manager.RyuApp):
         super().__init__(*args, **kwargs)
         self.logger.info("Levantando Ryu")
         self.mac_tables = {}
+        self.switches = {}
+        self._set_up_monitor()
+        self.csv_file = open(
+            "datasets/traffic_stats.csv",
+            "w",
+            newline=""
+        )
+
+        self.csv_writer = csv.writer(self.csv_file)
+        self._setup_csv_header()
+
+    def _set_up_monitor(self):
+        self.monitor_thread = hub.spawn(self._monitor)  # Thread con tareas de monitoreo
+        self.logger.info("Monitor online - recibiendo estadísticas")
+
+    # Event Handlers
 
     @set_ev_cls(
         ofp_event.EventOFPSwitchFeatures,
@@ -35,9 +54,11 @@ class TestController(app_manager.RyuApp):
         # self.logger.info( f"Versión {datapath.ofproto.OFP_VERSION}")
 
         switch_id = datapath.id
+        self.switches[switch_id] = datapath # Guardamos el switch
         self.mac_tables[switch_id] = {} # Crear tabla vacía para el switch
 
         install_send_everything_to_controller_rule(datapath)
+        install_discard_ipv6_traffic_rule(datapath)
 
 
     @set_ev_cls(
@@ -62,7 +83,7 @@ class TestController(app_manager.RyuApp):
 
         if eth.dst not in self.mac_tables[datapath.id].keys():
             out_port = datapath.ofproto.OFPP_FLOOD
-            self.logger.info("Haciendo flood")
+            # self.logger.info("Haciendo flood")
         else:
             out_port = self.mac_tables[datapath.id][eth.dst]
             self.logger.info(f"Redirigiendo paquete a {eth.dst}")
@@ -71,6 +92,37 @@ class TestController(app_manager.RyuApp):
 
         self.forward_packet(datapath, msg, out_port)
 
+
+    @set_ev_cls(
+        ofp_event.EventOFPPortStatsReply,
+        MAIN_DISPATCHER
+    )
+    def port_stats_reply_handler(self, ev):
+        body = ev.msg.body
+        # self.logger.info("Recibí estadísticas")
+        switch_id = ev.msg.datapath.id
+        for stat in body:
+            # self.logger.info(
+            #     f"Switch: {ev.msg.datapath.id}, "
+            #     f"Paquetes: {stat.packet_count}, "
+            #     f"Bytes: {stat.byte_count}"
+            # )
+            if stat.port_no > 0xffffff00:
+                continue
+
+            self.csv_writer.writerow([
+                time.time(),
+                switch_id,
+                stat.port_no,
+                stat.rx_packets,
+                stat.tx_packets,
+                stat.rx_bytes,
+                stat.tx_bytes
+            ])
+
+        self.csv_file.flush()
+
+    # Metodos
 
     def forward_packet(self, datapath, msg, port) -> Any:
         openflow_parser = datapath.ofproto_parser
@@ -89,3 +141,27 @@ class TestController(app_manager.RyuApp):
             data=msg.data
         )
         datapath.send_msg(out)
+
+    def request_port_stats(self, datapath):
+        parser = datapath.ofproto_parser
+        req = parser.OFPPortStatsRequest(datapath)
+        datapath.send_msg(req)
+
+    # Tarea periódica: cada 1 segundo pide estadísticas a todos los switches
+    def _monitor(self):
+        while True:
+            for datapath in self.switches.values():
+                self.request_port_stats(datapath)
+
+            hub.sleep(1)
+
+    def _setup_csv_header(self):
+        self.csv_writer.writerow([
+            "timestamp",
+            "switch_id",
+            "port_no",
+            "rx_packets",
+            "tx_packets",
+            "rx_bytes",
+            "tx_bytes"
+        ])
