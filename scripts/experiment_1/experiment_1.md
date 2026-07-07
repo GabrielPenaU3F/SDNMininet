@@ -1,5 +1,11 @@
 # Experimento 1
 
+## HOW TO RUN
+From a console on the directory SDN run:
+```bash
+sudo .venv/bin/python \
+    -m scripts.experiment_1.run_experiment
+```
 ## Descripción
 
 Las 8 fuentes generan tráfico Poisson, 
