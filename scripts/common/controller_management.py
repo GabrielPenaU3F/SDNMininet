@@ -10,7 +10,7 @@ RYU_MGR = "/home/sskies/SDN/.venv/bin/ryu-manager"
 
 def start_controller(controller_path, manager=RYU_MGR,
                      controller_ip='127.0.0.1', controller_port=6633, logfile="logs/controller.log"):
-    env = Environment.get_environment()
+    env = Environment.get_env_dict()
     cleanup()
     controller = subprocess.Popen(
         [
@@ -18,7 +18,9 @@ def start_controller(controller_path, manager=RYU_MGR,
             controller_path
         ], env=env
     )
-    _wait_until_controller_is_ready(controller, controller_ip=controller_ip, controller_port=controller_port)
+    time.sleep(2)
+    # TODO: improve this to detect when the controller is ACTUALLY initialized
+    # _wait_until_controller_is_ready(controller, controller_ip=controller_ip, controller_port=controller_port)
     return controller
 
 def stop_controller(controller):

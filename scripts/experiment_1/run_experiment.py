@@ -3,6 +3,7 @@ import numpy as np
 
 from scripts.common.environment import Environment
 from scripts.common.experiment_management import shutdown_experiment, begin_experiment
+from scripts.common.host_program_launcher import launch_program
 from topologies.test_topologies import AwadDDoSTopology
 
 env = Environment.get_environment()
@@ -15,23 +16,10 @@ h2 = net["h2"]
 
 rate_1, rate_2 = np.random.uniform(0, 10, 2)
 
-h1.popen([
-    "/home/sskies/SDN/.venv/bin/python",
-    "/home/sskies/SDN/scripts/experiment_1/host_program.py",
-    "--dst_ip", "10.0.0.2",
-    "--port", "100",
-    "--rate", f'{rate_1}'
-],
-env=env)
-
-h2.popen([
-    "/home/sskies/SDN/.venv/bin/python",
-    "/home/sskies/SDN/scripts/experiment_1/host_program.py",
-    "--dst_ip", "10.0.0.1",
-    "--port", "100",
-    "--rate", f'{rate_2}'
-],
-env=env)
+launch_program(h1, '/home/sskies/SDN/scripts/experiment_1/host_program.py',
+               dst_ip='10.0.0.2', port='100', rate=rate_1)
+launch_program(h1, '/home/sskies/SDN/scripts/experiment_1/host_program.py',
+               dst_ip='10.0.0.1', port='100', rate=rate_2)
 
 input("Presione ENTER para finalizar...")
 
