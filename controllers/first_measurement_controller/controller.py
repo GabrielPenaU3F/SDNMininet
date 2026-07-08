@@ -1,4 +1,6 @@
 import csv
+import os
+import socket
 import time
 from typing import Any
 
@@ -13,6 +15,7 @@ from ryu.ofproto import ofproto_v1_3
 
 from controllers.rules.packetin_rules import install_port_to_mac_rule
 from controllers.rules.setup_rules import install_send_everything_to_controller_rule, install_discard_ipv6_traffic_rule
+from src.environment import Environment
 
 
 class FirstMeasurementController(app_manager.RyuApp):
@@ -26,7 +29,6 @@ class FirstMeasurementController(app_manager.RyuApp):
         self.logger.info("Levantando Ryu")
         self.mac_tables = {}
         self.switches = {}
-        self._set_up_monitor()
         self.csv_file = open(
             "datasets/traffic_stats.csv",
             "w",
@@ -35,6 +37,12 @@ class FirstMeasurementController(app_manager.RyuApp):
 
         self.csv_writer = csv.writer(self.csv_file)
         self._setup_csv_header()
+
+    def start(self):
+        super().start()
+        self._set_up_monitor()
+        self._signal_startup_complete()
+        self.logger.info("Ryu: inicialización completa")
 
     def _set_up_monitor(self):
         self.monitor_thread = hub.spawn(self._monitor)  # Thread con tareas de monitoreo
@@ -83,7 +91,6 @@ class FirstMeasurementController(app_manager.RyuApp):
 
         if eth.dst not in self.mac_tables[datapath.id].keys():
             out_port = datapath.ofproto.OFPP_FLOOD
-            # self.logger.info("Haciendo flood")
         else:
             out_port = self.mac_tables[datapath.id][eth.dst]
             self.logger.info(f"Redirigiendo paquete a {eth.dst}")
@@ -99,14 +106,8 @@ class FirstMeasurementController(app_manager.RyuApp):
     )
     def port_stats_reply_handler(self, ev):
         body = ev.msg.body
-        # self.logger.info("Recibí estadísticas")
         switch_id = ev.msg.datapath.id
         for stat in body:
-            # self.logger.info(
-            #     f"Switch: {ev.msg.datapath.id}, "
-            #     f"Paquetes: {stat.packet_count}, "
-            #     f"Bytes: {stat.byte_count}"
-            # )
             if stat.port_no > 0xffffff00:
                 continue
 
@@ -165,3 +166,27 @@ class FirstMeasurementController(app_manager.RyuApp):
             "rx_bytes",
             "tx_bytes"
         ])
+
+    def _signal_startup_complete(self):
+        server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        server.settimeout(30)
+        socket_path = os.path.join(Environment.get_environment().controller_ready_sock)
+        if os.path.exists(socket_path):
+            os.unlink(socket_path)
+        server.bind(socket_path)
+        server.listen()
+
+        try:
+            conn, _ = server.accept()
+            conn.sendall(b'READY')
+            conn.close()
+
+        except socket.timeout:
+            self.logger.warning(
+                "Ninguna red se conectó a Ryu."
+            )
+
+        finally:
+            server.close()
+            if os.path.exists(socket_path):
+                os.unlink(socket_path)

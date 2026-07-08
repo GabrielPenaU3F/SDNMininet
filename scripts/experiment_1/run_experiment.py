@@ -1,7 +1,7 @@
 import numpy as np
 
 
-from scripts.common.environment import Environment
+from src.environment import Environment
 from scripts.common.experiment_management import shutdown_experiment, begin_experiment
 from scripts.common.host_program_launcher import launch_program
 from topologies.test_topologies import AwadDDoSTopology

@@ -1,4 +1,4 @@
-from scripts.common.environment import Environment
+from src.environment import Environment
 
 
 def launch_program(host, script_path: str, **kwargs):

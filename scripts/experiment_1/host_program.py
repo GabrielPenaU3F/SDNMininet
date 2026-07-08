@@ -16,9 +16,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     process = PoissonProcess(args.rate)
 
-    #
     # Creamos sender y receiver
-    #
     sender = UDPSender(
         process,
         args.dst_ip,

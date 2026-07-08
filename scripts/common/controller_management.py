@@ -4,12 +4,11 @@ import time
 
 from mininet.clean import cleanup
 
-from scripts.common.environment import Environment
+from src.environment import Environment
 
 RYU_MGR = "/home/sskies/SDN/.venv/bin/ryu-manager"
 
-def start_controller(controller_path, manager=RYU_MGR,
-                     controller_ip='127.0.0.1', controller_port=6633, logfile="logs/controller.log"):
+def start_controller(controller_path, manager=RYU_MGR, logfile="logs/controller.log"):
     env = Environment.get_env_dict()
     cleanup()
     controller = subprocess.Popen(
@@ -18,16 +17,14 @@ def start_controller(controller_path, manager=RYU_MGR,
             controller_path
         ], env=env
     )
-    time.sleep(2)
-    # TODO: improve this to detect when the controller is ACTUALLY initialized
-    # _wait_until_controller_is_ready(controller, controller_ip=controller_ip, controller_port=controller_port)
+    _wait_until_controller_is_ready(controller)
     return controller
 
 def stop_controller(controller):
     controller.terminate()
     controller.wait()
 
-def _wait_until_controller_is_ready(controller, controller_ip="127.0.0.1", controller_port=6633, timeout=10):
+def _wait_until_controller_is_ready(controller, timeout=30):
     deadline = time.time() + timeout
 
     while time.time() < deadline:
@@ -37,15 +34,17 @@ def _wait_until_controller_is_ready(controller, controller_ip="127.0.0.1", contr
                 f"El controlador terminó inesperadamente con código {controller.returncode}"
             )
 
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-            sock.settimeout(0.2)
-
+        with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as sock:
             try:
-                sock.connect((controller_ip, controller_port))
-                return
-            except (ConnectionRefusedError, OSError):
-                time.sleep(0.1)
+                sock.connect(Environment.get_environment().controller_ready_sock)
+            except FileNotFoundError: # if the socket was not found
+                time.sleep(1)
+                continue
+            data = sock.recv(1024)
+            if data == b'READY':
+                return # only in this case we are done
+            time.sleep(1) # if the socket exists but does not signal ready, go on
 
     raise TimeoutError(
-        f"El controlador no comenzó a escuchar en {controller_ip}:{controller_port}"
+        f"El controlador no se inicializó correctamente"
     )
