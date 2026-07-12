@@ -1,5 +1,5 @@
-from scripts.common.controller_management import stop_controller, start_controller
-from scripts.common.network_management import build_network
+from infrastructure.controller_management import stop_controller, start_controller
+from infrastructure.network_management import build_network
 
 
 def begin_experiment(controller_path, topology_cls,

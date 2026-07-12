@@ -4,7 +4,7 @@ import time
 
 from mininet.clean import cleanup
 
-from src.environment import Environment
+from src.config.environment import Environment
 
 RYU_MGR = "/home/sskies/SDN/.venv/bin/ryu-manager"
 
