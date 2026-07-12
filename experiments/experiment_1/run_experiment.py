@@ -8,8 +8,8 @@ from topologies.test_topologies import AwadDDoSTopology
 
 env = Environment.get_environment()
 
-net, ryu = begin_experiment(controller_path="controllers/first_measurement_controller/controller.py",
-                            topology_cls=AwadDDoSTopology)
+controller_path = env.controllers_path / 'base_controller' / 'controller.py'
+net, ryu = begin_experiment(controller_path=controller_path, topology_cls=AwadDDoSTopology)
 
 h1 = net["h1"]
 h2 = net["h2"]

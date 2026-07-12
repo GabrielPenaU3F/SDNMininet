@@ -18,7 +18,7 @@ from controllers.rules.setup_rules import install_send_everything_to_controller_
 from src.config.environment import Environment
 
 
-class FirstMeasurementController(app_manager.RyuApp):
+class BaseController(app_manager.RyuApp):
 
     OFP_VERSIONS = [
         ofproto_v1_3.OFP_VERSION
@@ -26,13 +26,15 @@ class FirstMeasurementController(app_manager.RyuApp):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.logger.info("Levantando Ryu")
+        self.logger.info('Launching Ryu')
         self.mac_tables = {}
         self.switches = {}
+
+        environment = Environment.get_environment()
         self.csv_file = open(
-            "datasets/traffic_stats.csv",
-            "w",
-            newline=""
+            environment.measurements_path / 'traffic_stats.csv',
+            'w',
+            newline=''
         )
 
         self.csv_writer = csv.writer(self.csv_file)
@@ -42,11 +44,11 @@ class FirstMeasurementController(app_manager.RyuApp):
         super().start()
         self._set_up_monitor()
         self._signal_startup_complete()
-        self.logger.info("Ryu: inicialización completa")
+        self.logger.info('Ryu: startup complete')
 
     def _set_up_monitor(self):
         self.monitor_thread = hub.spawn(self._monitor)  # Thread con tareas de monitoreo
-        self.logger.info("Monitor online - recibiendo estadísticas")
+        self.logger.info('Monitor online - receiving stats')
 
     # Event Handlers
 
@@ -57,7 +59,7 @@ class FirstMeasurementController(app_manager.RyuApp):
     def switch_features_handler(self, ev):
         datapath = ev.msg.datapath
         self.logger.info(
-            f"Switch conectado: {datapath.id}"
+            f'Switch online: {datapath.id}'
         )
         # self.logger.info( f"Versión {datapath.ofproto.OFP_VERSION}")
 
@@ -79,10 +81,10 @@ class FirstMeasurementController(app_manager.RyuApp):
         in_port = ev.msg.match['in_port']
 
         self.logger.info(
-            f"Puerto de entrada={in_port}, "
-            f"MAC origen={eth.src}, "
-            f"MAC destino={eth.dst}, "
-            f"Tipo Ethernet = {hex(eth.ethertype)}"
+            'In port = {in_port}, '
+            'Source MAC = {eth.src}, '
+            'Destination MAC = {eth.dst}, '
+            'Ethernet type = {hex(eth.ethertype)}'
         )
         msg = ev.msg
         datapath = msg.datapath
@@ -93,9 +95,9 @@ class FirstMeasurementController(app_manager.RyuApp):
             out_port = datapath.ofproto.OFPP_FLOOD
         else:
             out_port = self.mac_tables[datapath.id][eth.dst]
-            self.logger.info(f"Redirigiendo paquete a {eth.dst}")
+            self.logger.info(f'Forwarding packet to {eth.dst}')
             install_port_to_mac_rule(datapath, eth.dst, out_port)
-            self.logger.info(f"Instalando regla")
+            self.logger.info(f'Installing rule')
 
         self.forward_packet(datapath, msg, out_port)
 
@@ -183,7 +185,7 @@ class FirstMeasurementController(app_manager.RyuApp):
 
         except socket.timeout:
             self.logger.warning(
-                "Ninguna red se conectó a Ryu."
+                'No network connected to Ryu'
             )
 
         finally:
