@@ -4,7 +4,7 @@
 From a console on the directory SDN run:
 ```bash
 sudo .venv/bin/python \
-    -m scripts.experiment_1.run_experiment
+    -m experiments.experiment_1.run_experiment
 ```
 ## Descripción
 

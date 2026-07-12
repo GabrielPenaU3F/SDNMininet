@@ -6,6 +6,7 @@
       <excludeFolder url="file://$MODULE_DIR$/.venv" />
       <excludeFolder url="file://$MODULE_DIR$/temp" />
       <excludeFolder url="file://$MODULE_DIR$/ryu" />
+      <excludeFolder url="file://$MODULE_DIR$/datasets" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.8 (SDN)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />

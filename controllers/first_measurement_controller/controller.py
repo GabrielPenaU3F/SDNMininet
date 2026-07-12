@@ -15,7 +15,7 @@ from ryu.ofproto import ofproto_v1_3
 
 from controllers.rules.packetin_rules import install_port_to_mac_rule
 from controllers.rules.setup_rules import install_send_everything_to_controller_rule, install_discard_ipv6_traffic_rule
-from src.environment import Environment
+from src.config.environment import Environment
 
 
 class FirstMeasurementController(app_manager.RyuApp):

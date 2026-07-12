@@ -216,3 +216,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# TODO: maybe change later, some of these may be needed
+*.csv
