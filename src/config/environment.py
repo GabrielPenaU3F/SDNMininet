@@ -11,7 +11,7 @@ class Environment:
     def __init__(self):
         self.project_root = self._find_project_root()
         env = os.environ.copy()
-        env["PYTHONPATH"] = str(self.project_root)
+        env['PYTHONPATH'] = str(self.project_root)
         self.env = env
         self.python_path = PYTHON_VENV_PATH
         self._create_required_directories()
@@ -23,8 +23,16 @@ class Environment:
     # Properties
 
     @property
+    def topologies_path(self) -> Path:
+        return self.project_root / 'topologies'
+
+    @property
     def controllers_path(self) -> Path:
         return self.project_root / 'controllers'
+
+    @property
+    def experiments_path(self) -> Path:
+        return self.project_root / 'experiments'
 
     @property
     def measurements_path(self) -> Path:
@@ -33,6 +41,17 @@ class Environment:
     @property
     def temp_path(self) -> Path:
         return self.project_root / 'temp'
+
+    @property
+    def _required_directories(self):
+
+        return (
+            self.controllers_path,
+            self.topologies_path,
+            self.experiments_path,
+            self.temp_path,
+            self.measurements_path,
+        )
 
     # Class methods
 
@@ -53,21 +72,16 @@ class Environment:
         current = Path(__file__).resolve().parent
 
         while current != current.parent:
-            if (current / ".git").exists():
+            if (current / '.git').exists():
                 return current
             current = current.parent
 
-        raise RuntimeError("No se pudo encontrar la raíz del proyecto")
+        raise RuntimeError('Unable to find project root')
 
     def _create_required_directories(self):
-        """
-                Crea todos los directorios requeridos por el proyecto si aún no existen.
-                """
-
-        required_directories = (
-            self.measurements_path,
-            self.temp_path,
-        )
-
-        for directory in required_directories:
+        for directory in self._required_directories:
             directory.mkdir(parents=True, exist_ok=True)
+
+    @classmethod
+    def _reset_instance(cls):
+        cls._instance = None
