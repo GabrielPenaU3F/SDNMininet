@@ -16,7 +16,6 @@ def _cls_to_path(controller_cls):
 def start_controller(controller_cls, manager=RYU_MGR, logfile="logs/controller.log"):
     controller_path = _cls_to_path(controller_cls)
     env = Environment.get_env_dict()
-    cleanup()
     controller = subprocess.Popen(
         [
             manager,
