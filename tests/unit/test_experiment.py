@@ -24,53 +24,43 @@ class TestExperiment:
     def test_deploy_infrastructure(self, monkeypatch, dummy_experiment):
         import experiments.experiment as experiment_module
 
-        controller = Mock()
         network = Mock()
-        start_controller = Mock(return_value=controller)
-        build_network = Mock(return_value=network)
+        dummy_experiment.controller_mgr = Mock()
 
         monkeypatch.setattr(
             experiment_module,
-            'start_controller',
-            start_controller
+            "build_network",
+            Mock(return_value=network)
         )
 
         monkeypatch.setattr(
-            experiment_module,
-            'build_network',
-            build_network
+            dummy_experiment,
+            "_clean_sdn",
+            Mock()
         )
 
         dummy_experiment.deploy_infrastructure()
 
-        start_controller.assert_called_once()
-        build_network.assert_called_once()
-        network.start.assert_called_once()
+        dummy_experiment._clean_sdn.assert_called_once()
+        dummy_experiment.controller_mgr.start.assert_called_once()
 
-        assert dummy_experiment.controller is controller
-        assert dummy_experiment.net is network
-
-    def test_shutdown(self, monkeypatch, dummy_experiment):
-        import experiments.experiment as experiment_module
-
-        controller = Mock()
-        network = Mock()
-
-        stop_controller = Mock()
-
-        monkeypatch.setattr(
-            experiment_module,
-            'stop_controller',
-            stop_controller
+        experiment_module.build_network.assert_called_once_with(
+            dummy_experiment.topology_cls
         )
 
-        dummy_experiment.controller = controller
+        network.start.assert_called_once()
+        assert dummy_experiment.net is network
+
+    def test_shutdown(self, dummy_experiment):
+        dummy_experiment.controller_mgr = Mock()
+
+        network = Mock()
         dummy_experiment.net = network
 
         dummy_experiment.shutdown()
 
         network.stop.assert_called_once()
-        stop_controller.assert_called_once_with(controller)
+        dummy_experiment.controller_mgr.stop.assert_called_once()
 
     def test_shutdown_is_called_even_if_run_fails(self, failing_experiment):
         failing_experiment.deploy_infrastructure = Mock()
@@ -80,3 +70,11 @@ class TestExperiment:
             failing_experiment.execute()
 
         failing_experiment.shutdown.assert_called_once()
+
+    def test_shutdown_without_network(self, dummy_experiment):
+        dummy_experiment.net = None
+        dummy_experiment.controller_mgr = Mock()
+
+        dummy_experiment.shutdown()
+
+        dummy_experiment.controller_mgr.stop.assert_called_once()

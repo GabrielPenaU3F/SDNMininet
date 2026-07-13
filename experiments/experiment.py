@@ -2,15 +2,17 @@ from abc import ABC, abstractmethod
 
 import mininet.clean as mn_clean
 
-from infrastructure.controller_management import start_controller, stop_controller
+from infrastructure.controller_manager import ControllerManager
 from infrastructure.network_management import build_network
 
 
 class Experiment(ABC):
 
-    def __init__(self):
+    def __init__(self, **kwargs):
+        self.network_mgr = None
+        self.controller_mgr = ControllerManager(self.controller_cls, **kwargs)
+
         self.net = None
-        self.controller = None
 
     def execute(self):
         self.deploy_infrastructure()
@@ -21,7 +23,7 @@ class Experiment(ABC):
 
     def deploy_infrastructure(self, **kwargs):
         self._clean_sdn()
-        self.controller = start_controller(self.controller_cls, **kwargs)
+        self.controller_mgr.start()
         self.net = build_network(self.topology_cls, **kwargs)
         self.net.start()
 
@@ -30,8 +32,7 @@ class Experiment(ABC):
         if self.net is not None:
             self.net.stop()
 
-        if self.controller is not None:
-            stop_controller(self.controller)
+        self.controller_mgr.stop()
 
     def _clean_sdn(self):
         mn_clean.cleanup()
@@ -51,5 +52,3 @@ class Experiment(ABC):
     @abstractmethod
     def topology_cls(self):
         pass
-
-

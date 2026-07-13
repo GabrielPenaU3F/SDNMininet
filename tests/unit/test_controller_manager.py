@@ -6,7 +6,6 @@ from infrastructure.controller_manager import ControllerManager
 from tests.dummies.dummy_controller import DummyController
 
 
-
 @pytest.fixture
 def controller_manager():
     manager = ControllerManager(DummyController)
