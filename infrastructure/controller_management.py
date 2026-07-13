@@ -8,7 +8,13 @@ from src.config.environment import Environment
 
 RYU_MGR = "/home/sskies/SDN/.venv/bin/ryu-manager"
 
-def start_controller(controller_path, manager=RYU_MGR, logfile="logs/controller.log"):
+
+def _cls_to_path(controller_cls):
+    return controller_cls.__module__
+
+
+def start_controller(controller_cls, manager=RYU_MGR, logfile="logs/controller.log"):
+    controller_path = _cls_to_path(controller_cls)
     env = Environment.get_env_dict()
     cleanup()
     controller = subprocess.Popen(
@@ -31,7 +37,7 @@ def _wait_until_controller_is_ready(controller, timeout=30):
 
         if controller.poll() is not None:
             raise RuntimeError(
-                f"El controlador terminó inesperadamente con código {controller.returncode}"
+                f'Controller ended unexpectedly with code {controller.returncode}'
             )
 
         with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as sock:
@@ -46,5 +52,5 @@ def _wait_until_controller_is_ready(controller, timeout=30):
             time.sleep(1) # if the socket exists but does not signal ready, go on
 
     raise TimeoutError(
-        f"El controlador no se inicializó correctamente"
+        f'Controller was not correctly initialized'
     )
