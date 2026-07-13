@@ -51,3 +51,7 @@ def main():
 
     experiment = load_experiment(sys.argv[1])
     experiment.execute()
+
+
+if __name__ == '__main__':
+    main()

@@ -8,8 +8,12 @@ class Environment:
 
     instance = None
 
-    def __init__(self):
-        self.project_root = self._find_project_root()
+    def __init__(self, project_root: Path = None):
+
+        if project_root is None:
+            project_root = self._find_project_root()
+
+        self.project_root = Path(project_root)
         env = os.environ.copy()
         env['PYTHONPATH'] = str(self.project_root)
         self.env = env
