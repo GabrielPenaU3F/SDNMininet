@@ -3,8 +3,16 @@ import numpy as np
 from controllers.base_controller.controller import BaseController
 from experiments.experiment import Experiment
 from infrastructure.host_program_launcher import launch_program
-from topologies.test_topologies import AwadDDoSTopology
+from topologies.awad_topology import AwadDDoSTopology
 
+'''
+
+DESCRIPTION
+
+8 sources emmit Poisson, traffic, each one with a
+random rate sampled from a U[0, 10] distribution.
+
+'''
 
 class Experiment1(Experiment):
 
@@ -28,9 +36,3 @@ class Experiment1(Experiment):
     @property
     def topology_cls(self):
         return AwadDDoSTopology
-
-
-if __name__ == '__main__':
-
-    exp = Experiment1()
-    exp.execute()

@@ -7,16 +7,17 @@ from traffic_models.arrival_processes import PoissonProcess
 
 if __name__ == "__main__":
 
-    # Leer argumentos
+    # Read args
     parser = argparse.ArgumentParser()
     parser.add_argument("--dst_ip", required=True, type=str)
     parser.add_argument("--port", required=True, type=int)
     parser.add_argument("--rate", required=True, type=float)
 
+    # Parse
     args = parser.parse_args()
     process = PoissonProcess(args.rate)
 
-    # Creamos sender y receiver
+    # Create UDP sender and receiver
     sender = UDPSender(
         process,
         args.dst_ip,
