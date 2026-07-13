@@ -22,16 +22,9 @@ class TestExperiment:
         assert dummy_experiment.run_called is True
 
     def test_deploy_infrastructure(self, monkeypatch, dummy_experiment):
-        import experiments.experiment as experiment_module
 
-        network = Mock()
         dummy_experiment.controller_mgr = Mock()
-
-        monkeypatch.setattr(
-            experiment_module,
-            "build_network",
-            Mock(return_value=network)
-        )
+        dummy_experiment.network_mgr = Mock()
 
         monkeypatch.setattr(
             dummy_experiment,
@@ -43,23 +36,16 @@ class TestExperiment:
 
         dummy_experiment._clean_sdn.assert_called_once()
         dummy_experiment.controller_mgr.start.assert_called_once()
-
-        experiment_module.build_network.assert_called_once_with(
-            dummy_experiment.topology_cls
-        )
-
-        network.start.assert_called_once()
-        assert dummy_experiment.net is network
+        dummy_experiment.network_mgr.build_network.assert_called_once()
+        dummy_experiment.network_mgr.start.assert_called_once()
 
     def test_shutdown(self, dummy_experiment):
         dummy_experiment.controller_mgr = Mock()
-
-        network = Mock()
-        dummy_experiment.net = network
+        dummy_experiment.network_mgr = Mock()
 
         dummy_experiment.shutdown()
 
-        network.stop.assert_called_once()
+        dummy_experiment.network_mgr.stop.assert_called_once()
         dummy_experiment.controller_mgr.stop.assert_called_once()
 
     def test_shutdown_is_called_even_if_run_fails(self, failing_experiment):
