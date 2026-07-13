@@ -22,7 +22,7 @@ def show_available_experiments():
         print(f'    {experiment_name}')
 
 
-def ensure_sudo():
+def ensure_root():
     if os.geteuid() != 0:
         print('Retrieving privileges...')
         os.execvp('sudo',
@@ -32,7 +32,6 @@ def ensure_sudo():
                       *sys.argv
                   ]
                   )
-    return
 
 
 def validate_args():
@@ -42,14 +41,12 @@ def validate_args():
         print()
         show_available_experiments()
         sys.exit(1)
-    return
 
-if __name__ == '__main__':
+
+def main():
 
     validate_args()
-
-    ensure_sudo()
-
+    ensure_root()
     print('Launching experiment')
 
     experiment = load_experiment(sys.argv[1])
