@@ -1,3 +1,5 @@
+from argparse import Namespace
+
 import pytest
 
 from unittest.mock import Mock
@@ -34,56 +36,37 @@ class TestLoadExperiment:
         experiment = load_experiment('dummy_experiment')
         assert isinstance(experiment, DummyExperiment)
 
-    def test_unknown_experiment_exits(self, capsys):
-        with pytest.raises(SystemExit):
-            load_experiment('pepe')
-
-        captured = capsys.readouterr()
-
-        assert 'Unknown experiment' in captured.out
-        assert 'dummy_experiment' in captured.out
-
-    def test_valid_arguments(self, monkeypatch, valid_argv):
-        validate_args()
-
-    def test_no_arguments_raises_exception(self, monkeypatch):
-        monkeypatch.setattr(
-            'sys.argv',
-            [
-                'run.py'
-            ]
+    def test_validate_rejects_unknown_experiment(self, capsys):
+        args = Namespace(
+            experiment='pepe',
+            duration=60
         )
-        with pytest.raises(SystemExit):
-            validate_args()
 
-    def test_too_many_arguments_raise_exception(self, monkeypatch):
-        monkeypatch.setattr(
-            'sys.argv',
-            [
-                'run.py',
-                'dummy_experiment',
-                'another_arg'
-            ]
-        )
         with pytest.raises(SystemExit):
-            validate_args()
-
-    def test_invalid_usage_prints_help(self, monkeypatch, capsys):
-        monkeypatch.setattr(
-            'sys.argv',
-            [
-                'run.py'
-            ]
-        )
-        with pytest.raises(SystemExit):
-            validate_args()
+            validate_args(args)
 
         output = capsys.readouterr().out
-        assert 'Usage' in output
-        assert 'Available' in output
+        assert 'Unknown experiment' in output
+        assert 'dummy_experiment' in output
+
+    def test_validate_rejects_non_positive_duration(self, capsys):
+        args = Namespace(
+            experiment='dummy_experiment',
+            duration=0
+        )
+
+        with pytest.raises(SystemExit):
+            validate_args(args)
+
+        output = capsys.readouterr().out
+        assert 'duration' in output.lower()
+
+    def test_validate_accepts_valid_arguments(self):
+        args = Namespace(experiment='dummy_experiment', duration=60)
+        validate_args(args)
 
     def test_ensure_root_does_nothing_if_already_root(self, monkeypatch):
-        monkeypatch.setattr("os.geteuid", lambda: 0)
+        monkeypatch.setattr('os.geteuid', lambda: 0)
 
         execvp = Mock()
 

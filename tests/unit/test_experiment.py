@@ -28,7 +28,7 @@ class TestExperiment:
 
         monkeypatch.setattr(
             dummy_experiment,
-            "_clean_sdn",
+            '_clean_sdn',
             Mock()
         )
 
@@ -76,8 +76,8 @@ class TestWaitUntilFinished:
 
         sleep = Mock()
 
-        monkeypatch.setattr("time.monotonic", monotonic)
-        monkeypatch.setattr("time.sleep", sleep)
+        monkeypatch.setattr('time.monotonic', monotonic)
+        monkeypatch.setattr('time.sleep', sleep)
 
         dummy_experiment._wait_until_finished(duration = 1.0)
 
@@ -92,8 +92,8 @@ class TestWaitUntilFinished:
 
         sleep = Mock()
 
-        monkeypatch.setattr("time.monotonic", monotonic)
-        monkeypatch.setattr("time.sleep", sleep)
+        monkeypatch.setattr('time.monotonic', monotonic)
+        monkeypatch.setattr('time.sleep', sleep)
         dummy_experiment._wait_until_finished(duration=0)
         sleep.assert_not_called()
 
