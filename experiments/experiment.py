@@ -1,3 +1,4 @@
+import time
 from abc import ABC, abstractmethod
 
 import mininet.clean as mn_clean
@@ -13,10 +14,11 @@ class Experiment(ABC):
         self.network_mgr = NetworkManager(self.topology_cls, **kwargs)
         self.controller_mgr = ControllerManager(self.controller_cls, **kwargs)
 
-    def execute(self):
+    def execute(self, duration):
         self.deploy_infrastructure()
         try:
             self.run()
+            self._wait_until_finished(duration)
         finally:
             self.shutdown()
 
@@ -27,12 +29,17 @@ class Experiment(ABC):
         self.network_mgr.start()
 
     def shutdown(self):
-
         self.network_mgr.stop()
         self.controller_mgr.stop()
 
     def _clean_sdn(self):
         mn_clean.cleanup()
+
+    def _wait_until_finished(self, duration):
+        deadline = time.monotonic() + duration
+
+        while time.monotonic() < deadline:
+            time.sleep(0.5)
 
     @property
     def net(self):

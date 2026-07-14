@@ -2,7 +2,7 @@ import numpy as np
 
 from controllers.base_controller.controller import BaseController
 from experiments.experiment import Experiment
-from infrastructure.host_program_launcher import launch_program
+from launchers.host_program_launcher import launch_program
 from topologies.awad_topology import AwadDDoSTopology
 
 '''
@@ -27,7 +27,6 @@ class Experiment1(Experiment):
         launch_program(h2, '/experiments/experiment_1/host_program.py',
                        dst_ip='10.0.0.1', port='100', rate=rate_2)
 
-        input("Press ENTER to end...")
 
     @property
     def controller_cls(self):

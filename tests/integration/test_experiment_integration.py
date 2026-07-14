@@ -51,7 +51,7 @@ class TestExperimentIntegration:
 
     def test_experiment_deploys_real_infrastructure(self):
         exp = IntegrationTestExperiment()
-        exp.execute()
+        exp.execute(duration=1)
 
         stats_csv = Path(Environment.get_environment().traffic_stats_file)
         assert stats_csv.exists()
