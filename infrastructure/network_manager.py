@@ -6,7 +6,6 @@ class NetworkManager:
 
     def __init__(self, topology_cls, **kwargs):
         self.topology_cls = topology_cls
-        self._process = None
         self._net = None
 
     def build_network(self, controller_ip="127.0.0.1", controller_port=6633):
@@ -25,6 +24,7 @@ class NetworkManager:
         )
 
         self._net = net
+        return net
 
     def start(self):
         self._net.start()
