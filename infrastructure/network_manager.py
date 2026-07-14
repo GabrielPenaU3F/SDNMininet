@@ -6,7 +6,7 @@ class NetworkManager:
 
     def __init__(self, topology_cls, **kwargs):
         self.topology_cls = topology_cls
-        self._net = None
+        self.net = None
 
     def build_network(self, controller_ip="127.0.0.1", controller_port=6633):
         topo = self.topology_cls()
@@ -23,12 +23,12 @@ class NetworkManager:
             port=controller_port
         )
 
-        self._net = net
+        self.net = net
         return net
 
     def start(self):
-        self._net.start()
+        self.net.start()
 
     def stop(self):
-        if self._net is not None:
-            self._net.stop()
+        if self.net is not None:
+            self.net.stop()

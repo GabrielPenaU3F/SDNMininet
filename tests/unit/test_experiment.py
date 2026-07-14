@@ -58,9 +58,6 @@ class TestExperiment:
         failing_experiment.shutdown.assert_called_once()
 
     def test_shutdown_without_network(self, dummy_experiment):
-        dummy_experiment.net = None
         dummy_experiment.controller_mgr = Mock()
-
         dummy_experiment.shutdown()
-
         dummy_experiment.controller_mgr.stop.assert_called_once()

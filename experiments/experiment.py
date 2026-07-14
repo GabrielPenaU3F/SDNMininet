@@ -23,7 +23,7 @@ class Experiment(ABC):
     def deploy_infrastructure(self, **kwargs):
         self._clean_sdn()
         self.controller_mgr.start()
-        self.network_mgr.build_network(self.topology_cls, **kwargs)
+        self.network_mgr.build_network(**kwargs)
         self.network_mgr.start()
 
     def shutdown(self):
@@ -33,6 +33,10 @@ class Experiment(ABC):
 
     def _clean_sdn(self):
         mn_clean.cleanup()
+
+    @property
+    def net(self):
+        return self.network_mgr.net
 
     # === To be implemented by each subclass ===
 

@@ -28,7 +28,7 @@ class TestBuildNetwork:
         net_mock = Mock()
         make_mininet_patch(net_mock)
         net = network_manager.build_network()
-        assert network_manager._net is net
+        assert network_manager.net is net
 
     def test_build_network_uses_given_topology(self, monkeypatch, network_manager, make_mininet_patch):
         topo = Mock()
@@ -81,16 +81,16 @@ class TestBuildNetwork:
 class TestStart:
 
     def test_start_starts_network(self, network_manager):
-        network_manager._net = Mock()
+        network_manager.net = Mock()
         network_manager.start()
-        network_manager._net.start.assert_called_once()
+        network_manager.net.start.assert_called_once()
 
 class TestStop:
 
     def test_stop_stops_network(self, network_manager):
-        network_manager._net = Mock()
+        network_manager.net = Mock()
         network_manager.stop()
-        network_manager._net.stop.assert_called_once()
+        network_manager.net.stop.assert_called_once()
 
     def test_stop_does_nothing_if_network_was_not_created(self, network_manager):
         network_manager.stop()

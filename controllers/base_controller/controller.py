@@ -30,9 +30,8 @@ class BaseController(app_manager.RyuApp):
         self.mac_tables = {}
         self.switches = {}
 
-        environment = Environment.get_environment()
         self.csv_file = open(
-            environment.measurements_path / 'traffic_stats.csv',
+            Environment.get_environment().traffic_stats_file,
             'w',
             newline=''
         )

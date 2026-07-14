@@ -43,6 +43,10 @@ class Environment:
         return self.project_root / 'datasets' / 'measurements'
 
     @property
+    def traffic_stats_file(self):
+        return self.measurements_path / "traffic_stats.csv"
+
+    @property
     def temp_path(self) -> Path:
         return self.project_root / 'temp'
 
