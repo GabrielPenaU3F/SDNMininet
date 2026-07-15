@@ -8,7 +8,8 @@ from tests.dummies.dummy_controller import DummyController
 
 @pytest.fixture
 def controller_manager():
-    manager = ControllerManager(DummyController)
+    context = Mock()
+    manager = ControllerManager(DummyController, context)
     yield manager
 
     if manager.is_running:
@@ -24,7 +25,7 @@ def fake_socket(monkeypatch):
 
     monkeypatch.setattr(
         socket,
-        "socket",
+        'socket',
         MagicMock(return_value=sock)
     )
 
@@ -70,13 +71,13 @@ class TestStart:
 
         monkeypatch.setattr(
             controller_manager,
-            "_launch_controller",
+            '_launch_controller',
             Mock(return_value=process)
         )
 
         monkeypatch.setattr(
             controller_manager,
-            "_wait_until_ready",
+            '_wait_until_ready',
             Mock(side_effect=RuntimeError())
         )
 
@@ -93,13 +94,13 @@ class TestWaitUntilReady:
 
         monkeypatch.setattr(
             controller_manager,
-            "_launch_controller",
+            '_launch_controller',
             launch
         )
 
         monkeypatch.setattr(
             controller_manager,
-            "_wait_until_ready",
+            '_wait_until_ready',
             wait
         )
 
@@ -109,18 +110,18 @@ class TestWaitUntilReady:
     def test_wait_until_ready_returns_when_controller_becomes_ready(self, controller_manager, monkeypatch):
         monkeypatch.setattr(
             controller_manager,
-            "_is_process_alive",
+            '_is_process_alive',
             Mock(return_value=True)
         )
 
         monkeypatch.setattr(
             controller_manager,
-            "_is_controller_ready",
+            '_is_controller_ready',
             Mock(side_effect=[False, False, True])
         )
 
-        monkeypatch.setattr("time.sleep", Mock())
-        monkeypatch.setattr("time.monotonic", lambda: 0)
+        monkeypatch.setattr('time.sleep', Mock())
+        monkeypatch.setattr('time.monotonic', lambda: 0)
 
         controller_manager._wait_until_ready()
 
@@ -131,18 +132,18 @@ class TestWaitUntilReady:
 
         monkeypatch.setattr(
             controller_manager,
-            "_is_process_alive",
+            '_is_process_alive',
             Mock(side_effect=[True, True, False])
         )
 
         monkeypatch.setattr(
             controller_manager,
-            "_is_controller_ready",
+            '_is_controller_ready',
             Mock(return_value=False)
         )
 
-        monkeypatch.setattr("time.sleep", Mock())
-        monkeypatch.setattr("time.monotonic", lambda: 0)
+        monkeypatch.setattr('time.sleep', Mock())
+        monkeypatch.setattr('time.monotonic', lambda: 0)
 
         with pytest.raises(RuntimeError):
             controller_manager._wait_until_ready()
@@ -150,23 +151,23 @@ class TestWaitUntilReady:
     def test_raises_after_timeout(self, controller_manager, monkeypatch):
         monkeypatch.setattr(
             controller_manager,
-            "_is_process_alive",
+            '_is_process_alive',
             Mock(return_value=True)
         )
 
         monkeypatch.setattr(
             controller_manager,
-            "_is_controller_ready",
+            '_is_controller_ready',
             Mock(return_value=False)
         )
 
         monkeypatch.setattr(
             controller_manager,
-            "_timed_out",
+            '_timed_out',
             Mock(side_effect=[False, False, True])
         )
 
-        monkeypatch.setattr("time.sleep", Mock())
+        monkeypatch.setattr('time.sleep', Mock())
 
         with pytest.raises(TimeoutError):
             controller_manager._wait_until_ready()
@@ -175,7 +176,7 @@ class TestWaitUntilReady:
 class TestControllerReady:
 
     def test_returns_true_when_controller_signals_ready(self, controller_manager, fake_socket):
-        fake_socket.recv.return_value = b"READY"
+        fake_socket.recv.return_value = b'READY'
 
         assert controller_manager._is_controller_ready('/temp/controller.sock')
         fake_socket.connect.assert_called_once_with( '/temp/controller.sock')

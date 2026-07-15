@@ -36,7 +36,7 @@ class BaseController(app_manager.RyuApp):
     @staticmethod
     def _open_traffic_stats_file():
         return open(
-            'datasets/measurements/traffic_stats.csv',
+            'measurements/traffic_stats.csv',
             'w',
             newline=''
         )

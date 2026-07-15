@@ -8,8 +8,9 @@ RYU_MGR = '/home/sskies/SDN/.venv/bin/ryu-manager'
 
 class ControllerManager:
 
-    def __init__(self, controller_cls, timeout=30):
+    def __init__(self, controller_cls, context, timeout=30):
         self.controller_cls = controller_cls
+        self.context = context
         self._timeout = timeout
         self._process = None
 
@@ -32,7 +33,7 @@ class ControllerManager:
             [
                 manager,
                 controller_path,
-            ], env=env_dict, cwd=Environment.get_environment().output_root
+            ], env=env_dict, cwd=self.context.experiment_root
         )
 
     def _wait_until_ready(self):

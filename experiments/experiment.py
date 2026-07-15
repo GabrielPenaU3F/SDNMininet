@@ -13,7 +13,7 @@ class Experiment(ABC):
     def __init__(self, context, **kwargs):
         self.context = context
         self.network_mgr = NetworkManager(self.topology_cls, **kwargs)
-        self.controller_mgr = ControllerManager(self.controller_cls, **kwargs)
+        self.controller_mgr = ControllerManager(self.controller_cls, context, **kwargs)
 
     def execute(self):
         self.deploy_infrastructure()

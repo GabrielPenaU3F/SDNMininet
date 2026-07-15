@@ -8,16 +8,15 @@ class Environment:
 
     instance = None
 
-    def __init__(self, project_root = None, output_root = None):
+    def __init__(self, project_root=None, experiment_root=None):
 
         if project_root is None:
             project_root = self._find_project_root()
-
-        if output_root is None:
-            output_root = project_root
-
         self.project_root = Path(project_root)
-        self.output_root = Path(output_root)
+
+        if experiment_root is None:
+            experiment_root = self.experiments_path
+        self.experiment_root = Path(experiment_root)
 
         env = os.environ.copy()
         env['PYTHONPATH'] = str(self.project_root)
@@ -44,12 +43,8 @@ class Environment:
         return self.project_root / 'experiments'
 
     @property
-    def measurements_path(self) -> Path:
-        return self.output_root / 'datasets' / 'measurements'
-
-    @property
-    def traffic_stats_file(self):
-        return self.measurements_path / "traffic_stats.csv"
+    def stats_file_path(self) -> Path:
+        return self.experiment_root / 'measurements' / 'traffic_stats.csv'
 
     @property
     def temp_path(self) -> Path:
@@ -62,8 +57,8 @@ class Environment:
             self.controllers_path,
             self.topologies_path,
             self.experiments_path,
+            self.experiments_path / 'measurements',
             self.temp_path,
-            self.measurements_path,
         )
 
     # Class methods

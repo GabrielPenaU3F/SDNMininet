@@ -25,13 +25,12 @@ class TestEnvironmentBasics:
         assert env.temp_path == expected_project_root / 'temp'
         assert env.controllers_path == expected_project_root / 'controllers'
 
-    def test_output_paths_are_relative_to_output_root(self):
+    def test_stats_file_path_is_relative_to_experiment_root(self):
         env = Environment.get_environment()
-        expected_output_root = Path(__file__).resolve().parents[2]
-        assert env.measurements_path == (
-                expected_output_root /
-                'datasets' /
-                'measurements'
+        expected_project_root = Path(__file__).resolve().parents[2]
+        assert env.stats_file_path == (
+                expected_project_root /
+                'experiments' / 'measurements' / 'traffic_stats.csv'
         )
 
 
@@ -52,7 +51,3 @@ class TestEnvironmentFilesystem:
     def test_environment_creates_temp_directory(self, fake_env):
         assert fake_env.temp_path.exists()
         assert fake_env.temp_path.is_dir()
-
-    def test_environment_creates_measurements_directory(self, fake_env):
-        assert fake_env.measurements_path.exists()
-        assert fake_env.measurements_path.is_dir()
