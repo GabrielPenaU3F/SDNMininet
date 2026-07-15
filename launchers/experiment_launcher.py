@@ -28,7 +28,8 @@ class ExperimentLauncher:
         for experiment_name in self._experiments:
             print(f'{experiment_name}')
 
-    def _ensure_root(self):
+    @staticmethod
+    def _ensure_root():
         if os.geteuid() != 0:
             print('Retrieving privileges...')
             os.execvp('sudo', ['sudo', sys.executable, *sys.argv])
@@ -44,7 +45,8 @@ class ExperimentLauncher:
             print('Experiment duration must be positive')
             sys.exit(1)
 
-    def _parse_args(self, argv=None):
+    @staticmethod
+    def _parse_args(argv):
         parser = argparse.ArgumentParser()
 
         parser.add_argument(
@@ -59,4 +61,4 @@ class ExperimentLauncher:
             help='Experiment duration in seconds'
         )
 
-        return parser.parse_args()
+        return parser.parse_args(argv)

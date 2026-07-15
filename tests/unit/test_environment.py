@@ -2,7 +2,7 @@ import pytest
 
 from pathlib import Path
 
-from src.config.environment import Environment
+from config.environment import Environment
 
 @pytest.fixture
 def fake_env(tmp_path):

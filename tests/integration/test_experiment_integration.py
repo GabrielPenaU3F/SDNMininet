@@ -6,7 +6,7 @@ import csv
 
 from controllers.base_controller.controller import BaseController
 from experiments.experiment import Experiment
-from src.config.environment import Environment
+from config.environment import Environment
 from topologies.simple_topology import SimpleTopology
 
 

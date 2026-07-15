@@ -2,7 +2,7 @@ import socket
 import subprocess
 import time
 
-from src.config.environment import Environment
+from config.environment import Environment
 
 RYU_MGR = '/home/sskies/SDN/.venv/bin/ryu-manager'
 

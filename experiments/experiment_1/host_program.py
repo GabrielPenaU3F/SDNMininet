@@ -1,8 +1,8 @@
 import argparse
 
-from src.host import Host
-from src.udp_receiver import UDPReceiver
-from src.udp_sender import UDPSender
+from model.host import Host
+from model.udp_receiver import UDPReceiver
+from model.udp_sender import UDPSender
 from traffic_models.arrival_processes import PoissonProcess
 
 if __name__ == "__main__":
