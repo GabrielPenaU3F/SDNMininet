@@ -8,12 +8,17 @@ class Environment:
 
     instance = None
 
-    def __init__(self, project_root: Path = None):
+    def __init__(self, project_root = None, output_root = None):
 
         if project_root is None:
             project_root = self._find_project_root()
 
+        if output_root is None:
+            output_root = project_root
+
         self.project_root = Path(project_root)
+        self.output_root = Path(output_root)
+
         env = os.environ.copy()
         env['PYTHONPATH'] = str(self.project_root)
         self.env = env
@@ -40,7 +45,7 @@ class Environment:
 
     @property
     def measurements_path(self) -> Path:
-        return self.project_root / 'datasets' / 'measurements'
+        return self.output_root / 'datasets' / 'measurements'
 
     @property
     def traffic_stats_file(self):
@@ -71,9 +76,7 @@ class Environment:
 
     @classmethod
     def get_env_dict(cls):
-        if cls.instance is None:
-           cls.instance = Environment()
-        return cls.instance.env
+        return cls.get_environment().env
 
     @staticmethod
     def _find_project_root():
@@ -92,4 +95,4 @@ class Environment:
 
     @classmethod
     def _reset_instance(cls):
-        cls._instance = None
+        cls.instance = None

@@ -31,8 +31,8 @@ class ControllerManager:
         return subprocess.Popen(
             [
                 manager,
-                controller_path
-            ], env=env_dict
+                controller_path,
+            ], env=env_dict, cwd=Environment.get_environment().output_root
         )
 
     def _wait_until_ready(self):

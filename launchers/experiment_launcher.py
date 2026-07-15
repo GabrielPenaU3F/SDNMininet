@@ -2,6 +2,8 @@ import argparse
 import os
 import sys
 
+from config.execution_context import ExecutionContext
+
 
 class ExperimentLauncher:
 
@@ -15,13 +17,19 @@ class ExperimentLauncher:
 
         print('Launching experiment')
 
-        experiment = self._load_experiment(args.experiment)
-        experiment.execute(duration=args.duration)
+        context = ExecutionContext(
+            duration=args.duration,
+            seed=args.seed,
+        )
+        experiment = self._load_experiment(args.experiment, context)
+        experiment.execute()
 
         print('Experiment complete')
 
-    def _load_experiment(self, name):
-        return self._experiments[name]()
+    def _load_experiment(self, name, context):
+        experiment_cls = self._experiments[name]
+        return experiment_cls(context)
+
 
     def _show_available_experiments(self):
         print('Available experiments:')

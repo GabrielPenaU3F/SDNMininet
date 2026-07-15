@@ -25,6 +25,7 @@ class IntegrationTestExperiment(Experiment):
 
     @property
     def controller_cls(self):
+        print(BaseController.__module__)
         return BaseController
 
     @property
@@ -32,27 +33,32 @@ class IntegrationTestExperiment(Experiment):
         return SimpleTopology
 
     def run(self):
-        h1 = self.net.get("h1")
-        h1.cmd("ping -c 3 h2")
+        h1 = self.net.get('h1')
+        h1.cmd('ping -c 3 h2')
         time.sleep(2)
 
 
 @pytest.fixture
-def experiment(tmp_path):
+def experiment(tmp_path, execution_context):
     tmp_root = tmp_path / 'fake_project'
     Environment._reset_instance()
-    Environment.instance = Environment(project_root=tmp_root)
-    exp = IntegrationTestExperiment()
+    Environment.instance = Environment(project_root=None, output_root=tmp_root)
+    exp = IntegrationTestExperiment(execution_context)
     return exp
 
 
 class TestExperimentIntegration:
 
-
-    def test_experiment_deploys_real_infrastructure(self):
-        exp = IntegrationTestExperiment()
-        exp.execute(duration=1)
-
+    def test_experiment_deploys_real_infrastructure(self, experiment):
+        experiment.execute()
         stats_csv = Path(Environment.get_environment().traffic_stats_file)
+
+        print("expected:", Environment.get_environment().traffic_stats_file)
+
+        print(
+            "real:",
+            Path.cwd() / "datasets" / "measurements" / "traffic_stats.csv"
+        )
+
         assert stats_csv.exists()
         assert csv_has_at_least_one_data_row(stats_csv)

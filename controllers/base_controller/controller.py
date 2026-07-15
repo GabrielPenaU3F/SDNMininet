@@ -29,15 +29,17 @@ class BaseController(app_manager.RyuApp):
         self.logger.info('Launching Ryu')
         self.mac_tables = {}
         self.switches = {}
+        self._traffic_stats_csv = self._open_traffic_stats_file()
+        self.csv_writer = csv.writer(self._traffic_stats_csv)
+        self._setup_csv_header()
 
-        self.csv_file = open(
-            Environment.get_environment().traffic_stats_file,
+    @staticmethod
+    def _open_traffic_stats_file():
+        return open(
+            'datasets/measurements/traffic_stats.csv',
             'w',
             newline=''
         )
-
-        self.csv_writer = csv.writer(self.csv_file)
-        self._setup_csv_header()
 
     def start(self):
         super().start()
@@ -122,7 +124,7 @@ class BaseController(app_manager.RyuApp):
                 stat.tx_bytes
             ])
 
-        self.csv_file.flush()
+        self._traffic_stats_csv.flush()
 
     # Metodos
 

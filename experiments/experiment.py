@@ -10,15 +10,16 @@ from infrastructure.network_manager import NetworkManager
 
 class Experiment(ABC):
 
-    def __init__(self, **kwargs):
+    def __init__(self, context, **kwargs):
+        self.context = context
         self.network_mgr = NetworkManager(self.topology_cls, **kwargs)
         self.controller_mgr = ControllerManager(self.controller_cls, **kwargs)
 
-    def execute(self, duration):
+    def execute(self):
         self.deploy_infrastructure()
         try:
             self.run()
-            self._wait_until_finished(duration)
+            self._wait_until_finished()
         finally:
             self.shutdown()
 
@@ -32,11 +33,12 @@ class Experiment(ABC):
         self.network_mgr.stop()
         self.controller_mgr.stop()
 
-    def _clean_sdn(self):
+    @staticmethod
+    def _clean_sdn():
         mn_clean.cleanup()
 
-    def _wait_until_finished(self, duration):
-        deadline = time.monotonic() + duration
+    def _wait_until_finished(self):
+        deadline = time.monotonic() + self.context.duration
 
         while time.monotonic() < deadline:
             time.sleep(0.5)

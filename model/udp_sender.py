@@ -1,7 +1,7 @@
 import socket
 import time
 
-from traffic_models.arrival_processes import ArrivalProcess
+from model.traffic_models import ArrivalProcess
 
 
 class UDPSender:

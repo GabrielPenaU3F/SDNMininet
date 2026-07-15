@@ -7,8 +7,8 @@ class DummyExperiment(Experiment):
     controller_cls = DummyController
     topology_cls = object
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, context):
+        super().__init__(context)
         self.run_called = False
 
     def run(self):

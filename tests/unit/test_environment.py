@@ -24,8 +24,12 @@ class TestEnvironmentBasics:
         expected_project_root = Path(__file__).resolve().parents[2]
         assert env.temp_path == expected_project_root / 'temp'
         assert env.controllers_path == expected_project_root / 'controllers'
+
+    def test_output_paths_are_relative_to_output_root(self):
+        env = Environment.get_environment()
+        expected_output_root = Path(__file__).resolve().parents[2]
         assert env.measurements_path == (
-                expected_project_root /
+                expected_output_root /
                 'datasets' /
                 'measurements'
         )

@@ -3,7 +3,7 @@ import argparse
 from model.host import Host
 from model.udp_receiver import UDPReceiver
 from model.udp_sender import UDPSender
-from traffic_models.arrival_processes import PoissonProcess
+from model.traffic_models import PoissonProcess
 
 if __name__ == "__main__":
 
