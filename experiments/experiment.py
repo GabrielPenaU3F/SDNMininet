@@ -6,12 +6,14 @@ import mininet.clean as mn_clean
 from infrastructure.controller_manager import ControllerManager
 
 from infrastructure.network_manager import NetworkManager
+from launchers.host_program_launcher import HostProgramLauncher
 
 
 class Experiment(ABC):
 
     def __init__(self, context, **kwargs):
         self.context = context
+        self.program_launcher = HostProgramLauncher(self.context)
         self.network_mgr = NetworkManager(self.topology_cls, **kwargs)
         self.controller_mgr = ControllerManager(self.controller_cls, context, **kwargs)
 

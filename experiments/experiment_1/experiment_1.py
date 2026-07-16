@@ -2,7 +2,6 @@ import numpy as np
 
 from controllers.base_controller.controller import BaseController
 from experiments.experiment import Experiment
-from launchers.host_program_launcher import launch_program
 from topologies.awad_topology import AwadDDoSTopology
 
 '''
@@ -22,10 +21,12 @@ class Experiment1(Experiment):
 
         rate_1, rate_2 = np.random.uniform(0, 10, 2)
 
-        launch_program(h1, '/experiments/experiment_1/host_program.py',
-                       dst_ip='10.0.0.2', port='100', rate=rate_1)
-        launch_program(h2, '/experiments/experiment_1/host_program.py',
-                       dst_ip='10.0.0.1', port='100', rate=rate_2)
+        self.program_launcher.launch(h1,
+                                     script_path='/experiments/experiment_1/host_program.py',
+                                     dst_ip='10.0.0.2', port='100', rate=rate_1)
+        self.program_launcher.launch(h2,
+                                     script_path='/experiments/experiment_1/host_program.py',
+                                     dst_ip='10.0.0.1', port='100', rate=rate_2)
 
 
     @property

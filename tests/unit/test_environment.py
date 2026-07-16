@@ -25,14 +25,6 @@ class TestEnvironmentBasics:
         assert env.temp_path == expected_project_root / 'temp'
         assert env.controllers_path == expected_project_root / 'controllers'
 
-    def test_stats_file_path_is_relative_to_experiment_root(self):
-        env = Environment.get_environment()
-        expected_project_root = Path(__file__).resolve().parents[2]
-        assert env.stats_file_path == (
-                expected_project_root /
-                'experiments' / 'measurements' / 'traffic_stats.csv'
-        )
-
 
 class TestEnvironmentFilesystem:
 

@@ -43,21 +43,15 @@ class Environment:
         return self.project_root / 'experiments'
 
     @property
-    def stats_file_path(self) -> Path:
-        return self.experiment_root / 'measurements' / 'traffic_stats.csv'
-
-    @property
     def temp_path(self) -> Path:
         return self.project_root / 'temp'
 
     @property
     def _required_directories(self):
-
         return (
             self.controllers_path,
             self.topologies_path,
             self.experiments_path,
-            self.experiments_path / 'measurements',
             self.temp_path,
         )
 

@@ -69,4 +69,11 @@ class ExperimentLauncher:
             help='Experiment duration in seconds'
         )
 
+        parser.add_argument(
+            '--seed',
+            type=int,
+            default=None,
+            help='Random seed for reproducible experiments'
+        )
+
         return parser.parse_args(argv)
