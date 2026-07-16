@@ -12,4 +12,4 @@ def execution_context(tmp_path):
 
 @pytest.fixture
 def context_args(tmp_path):
-    return Namespace(name='dummy_experiment', duration=0.001, seed=42, experiment_path=tmp_path)
+    return Namespace(experiment='dummy_experiment', duration=0.001, seed=42, experiment_path=tmp_path)

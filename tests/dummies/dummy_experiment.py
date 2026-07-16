@@ -1,11 +1,12 @@
 from experiments.experiment import Experiment
 from tests.dummies.dummy_controller import DummyController
+from tests.dummies.dummy_topology import DummyTopology
 
 
 class DummyExperiment(Experiment):
 
     controller_cls = DummyController
-    topology_cls = object
+    topology_cls = DummyTopology
 
     def __init__(self, context):
         super().__init__(context)
@@ -18,7 +19,7 @@ class DummyExperiment(Experiment):
 class FailingExperiment(Experiment):
 
     controller_cls = DummyController
-    topology_cls = object
+    topology_cls = DummyTopology
 
     def run(self):
         raise RuntimeError("boom")

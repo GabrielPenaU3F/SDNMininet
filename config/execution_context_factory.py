@@ -23,9 +23,9 @@ class ExecutionContextFactory:
 
     @staticmethod
     def _calculate_experiment_root(args) -> Any:
-        if args.experiment_path is not None:
+        if 'experiment_path' in vars(args):
             base_path = args.experiment_path
         else:
              base_path = Environment.get_environment().experiments_path
 
-        return Path(base_path / args.name)
+        return Path(base_path / args.experiment)
