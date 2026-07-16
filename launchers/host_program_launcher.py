@@ -4,13 +4,18 @@ from config.environment import Environment
 
 class HostProgramLauncher:
 
-    # TODO: should receive the context
+    def __init__(self, context):
+        self.context = context
+
     def launch(self, mn_process_launcher, script_path: str, **kwargs):
         command = self._build_command(script_path, **kwargs)
-        return mn_process_launcher.popen(command, env=Environment.get_env_dict())
+        return mn_process_launcher.popen(command,
+                                         env=Environment.get_env_dict(),
+                                         cwd=self.context.experiment_root)
 
     def _build_command(self, script_path: str, **kwargs) -> List[str]:
         python_path = Environment.get_environment().python_path
+        script_path = Environment.get_environment().project_root / script_path
         args = self._build_command_args(**kwargs)
         command = [
             python_path,

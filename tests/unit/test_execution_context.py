@@ -6,10 +6,6 @@ from config.environment import Environment
 from config.execution_context import ExecutionContext
 
 
-@pytest.fixture
-def tmp_context(tmp_path):
-    return ExecutionContext(duration=0.001, seed=42, experiment_root=tmp_path)
-
 class TestExecutionContext:
 
     def test_uses_given_experiment_root(self, tmp_context, tmp_path):
