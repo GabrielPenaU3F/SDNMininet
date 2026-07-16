@@ -15,11 +15,12 @@ def failing_experiment(execution_context):
     return FailingExperiment(execution_context)
 
 @pytest.fixture
-def make_dummy_experiment_with_duration():
+def make_dummy_experiment_with_duration(tmp_path):
     def _make(duration):
         context = ExecutionContext(
             duration=duration,
-            seed=42
+            seed=42,
+            experiment_root=tmp_path
         )
         return DummyExperiment(context)
     return _make

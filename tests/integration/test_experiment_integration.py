@@ -41,7 +41,7 @@ class TestExperimentIntegration:
     def test_experiment_deploys_real_infrastructure(self, make_experiment, tmp_path):
         experiment = make_experiment(IntegrationTestExperiment)
         experiment.execute()
-        stats_csv = Path(tmp_path / 'measurements' / 'traffic_stats.csv')
+        stats_csv = Path(tmp_path / 'dummy_experiment' / 'measurements' / 'traffic_stats.csv')
 
         assert stats_csv.exists()
         assert csv_has_at_least_one_data_row(stats_csv)
