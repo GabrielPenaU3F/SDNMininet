@@ -1,17 +1,17 @@
 import argparse
 
 from model.host import Host
+from model.traffic_models.arrival_processes import PoissonProcess
 from model.udp_receiver import UDPReceiver
 from model.udp_sender import UDPSender
-from model.traffic_models import PoissonProcess
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     # Read args
     parser = argparse.ArgumentParser()
-    parser.add_argument("--dst_ip", required=True, type=str)
-    parser.add_argument("--port", required=True, type=int)
-    parser.add_argument("--rate", required=True, type=float)
+    parser.add_argument('--dst_ip', required=True, type=str)
+    parser.add_argument('--port', required=True, type=int)
+    parser.add_argument('--rate', required=True, type=float)
 
     # Parse
     args = parser.parse_args()
