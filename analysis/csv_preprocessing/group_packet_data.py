@@ -76,6 +76,9 @@ def normalize_traffic_statistics(input_csv: str, output_csv: str,
         .reset_index()
     )
 
+    # Normalize so it starts on 0
+    df['rx_packets'] -= df['rx_packets'].iloc[0]
+
     # Save data
     df.to_csv(output_csv, index=False)
 

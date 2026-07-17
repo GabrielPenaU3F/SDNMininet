@@ -9,7 +9,7 @@ from topologies.awad_topology import AwadDDoSTopology
 DESCRIPTION
 
 8 sources emmit Poisson, traffic, each one with a
-random rate sampled from a U[0, 10] distribution.
+random rate sampled from a U[30, 60] distribution.
 
 '''
 
