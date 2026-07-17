@@ -3,7 +3,7 @@ from pathlib import Path
 
 import csv
 
-from controllers.base_controller.controller import BaseController
+from controllers.base_controller import BaseController
 from experiments.experiment import Experiment
 from topologies.simple_topology import SimpleTopology
 

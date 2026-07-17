@@ -1,5 +1,5 @@
 from config.execution_context_factory import ExecutionContextFactory
-from controllers.base_controller.controller import BaseController
+from controllers.base_controller import BaseController
 from infrastructure.controller_manager import ControllerManager
 
 

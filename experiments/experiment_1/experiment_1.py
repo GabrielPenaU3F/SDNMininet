@@ -1,6 +1,4 @@
-import numpy as np
-
-from controllers.base_controller.controller import BaseController
+from controllers.exp1_controller import Experiment1Controller
 from experiments.experiment import Experiment
 from topologies.awad_topology import AwadDDoSTopology
 
@@ -33,7 +31,7 @@ class Experiment1(Experiment):
 
     @property
     def controller_cls(self):
-        return BaseController
+        return Experiment1Controller
 
     @property
     def topology_cls(self):

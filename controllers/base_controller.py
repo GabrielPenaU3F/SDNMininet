@@ -29,6 +29,8 @@ class BaseController(app_manager.RyuApp):
         self.logger.info('Launching Ryu')
         self.mac_tables = {}
         self.switches = {}
+        self.current_poll_id = 0
+        self.switch_poll = {}
         self.sampling_interval = float(os.getenv('SAMPLING_INTERVAL', '1.0'))
         self._traffic_stats_csv = self._open_traffic_stats_file()
         self.csv_writer = csv.writer(self._traffic_stats_csv)
@@ -84,10 +86,10 @@ class BaseController(app_manager.RyuApp):
         in_port = ev.msg.match['in_port']
 
         self.logger.info(
-            'In port = {in_port}, '
-            'Source MAC = {eth.src}, '
-            'Destination MAC = {eth.dst}, '
-            'Ethernet type = {hex(eth.ethertype)}'
+            f'In port = {in_port}, '
+            f'Source MAC = {eth.src}, '
+            f'Destination MAC = {eth.dst}, '
+            f'Ethernet type = {hex(eth.ethertype)}'
         )
         msg = ev.msg
         datapath = msg.datapath
@@ -116,7 +118,9 @@ class BaseController(app_manager.RyuApp):
             if stat.port_no > 0xffffff00:
                 continue
 
+            poll_id = self.switch_poll[switch_id]
             self.csv_writer.writerow([
+                poll_id,
                 time.time(),
                 switch_id,
                 stat.port_no,
@@ -156,13 +160,16 @@ class BaseController(app_manager.RyuApp):
     # Ask for stats
     def _monitor(self):
         while True:
+            self.current_poll_id += 1
             for datapath in self.switches.values():
+                self.switch_poll[datapath.id] = self.current_poll_id
                 self.request_port_stats(datapath)
 
             hub.sleep(self.sampling_interval)
 
     def _setup_csv_header(self):
         self.csv_writer.writerow([
+            'poll_id',
             'timestamp',
             'switch_id',
             'port_no',

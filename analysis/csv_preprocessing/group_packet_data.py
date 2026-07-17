@@ -1,7 +1,6 @@
 from pathlib import Path
 from sys import argv
 
-import numpy as np
 import pandas as pd
 
 
@@ -11,8 +10,7 @@ fall within the same aggregation window. Therefore, the aggregation window shoul
 chosen significantly larger than the controller polling jitter.
 '''
 def normalize_traffic_statistics(input_csv: str, output_csv: str,
-    switch_id: int = -1, timestamp_scale: float = 1.0, bin_width: float = 0.01,
-) -> None:
+    switch_id: int = -1, timestamp_scale: float = 1.0) -> None:
     """
     Converts statistics to the format
 
@@ -27,9 +25,8 @@ def normalize_traffic_statistics(input_csv: str, output_csv: str,
     timestamp_scale
         Unit conversion factor.
 
-    bin_width
-        Length of the time window over which packets are grouped.
     """
+
     input_csv = Path(input_csv)
     output_csv = Path(output_csv)
     df = pd.read_csv(input_csv)
@@ -38,46 +35,53 @@ def normalize_traffic_statistics(input_csv: str, output_csv: str,
     if switch_id != -1:
         df = df[df['switch_id'] == switch_id]
 
-    # Unit conversion
+    # Normalize timestamps
     t0 = df['timestamp'].iloc[0]
-    df["timestamp"] -= t0
-    df['timestamp'] *= timestamp_scale
+    df['timestamp'] = (df['timestamp'] - t0) * timestamp_scale
 
-    # Assign each sample to a window
-    df['timestamp'] = np.round(np.floor(df['timestamp'] / bin_width) * bin_width, 3)
-
-    # Sort (security)
-    df = df.sort_values('timestamp')
-
-    # Read the last entry of each port
+    # Group
     df = (
-        df.groupby(['timestamp', 'port_no'], as_index=False)['rx_packets']
+        df.sort_values('timestamp')
+        .groupby(
+            ['poll_id', 'switch_id', 'port_no'],
+            as_index=False
+        )
         .last()
     )
 
-    # Sum across every port of the requested switch/s
-    df = (
-        df.groupby('timestamp', as_index=False)['rx_packets']
-        .sum()
+    # Keep only complete polling rounds
+    expected_rows = df.groupby('poll_id').size().max()
+
+    valid_polls = (
+        df.groupby('poll_id')
+        .size()
+        .loc[lambda s: s == expected_rows]
+        .index
     )
 
-    timestamps = np.arange(
-        0,
-        df['timestamp'].iloc[-1] + bin_width,
-        bin_width,
-    ).round(3)
+    df = df[df['poll_id'].isin(valid_polls)]
 
+
+    # Aggregate all ports
     df = (
-        df.set_index('timestamp')
-        .reindex(timestamps)
-        .ffill()
-        .fillna(0)
-        .rename_axis('timestamp')
-        .reset_index()
+        df.groupby('poll_id', as_index=False)
+        .agg(
+            timestamp=('timestamp', 'min'),
+            rx_packets=('rx_packets', 'sum')
+        )
     )
+
+    # Drop innecessary column
+    df = df.drop(columns='poll_id')
 
     # Normalize so it starts on 0
     df['rx_packets'] -= df['rx_packets'].iloc[0]
+
+    # Rename if desired
+    df = df.rename(columns={'rx_packets': 'packets'})
+
+    # Round timestamps
+    df['timestamp'] = df['timestamp'].round(3)
 
     # Save data
     df.to_csv(output_csv, index=False)
@@ -85,6 +89,6 @@ def normalize_traffic_statistics(input_csv: str, output_csv: str,
 
 if __name__ == '__main__':
 
-    input_csv, output_csv, switch_id, scale, bin_width = [argv[1], argv[2], argv[3], argv[4], argv[5]]
+    input_csv, output_csv, switch_id, scale = [argv[1], argv[2], argv[3], argv[4]]
     normalize_traffic_statistics(input_csv, output_csv,
-         switch_id=int(switch_id), timestamp_scale=float(scale), bin_width=float(bin_width))
+         switch_id=int(switch_id), timestamp_scale=float(scale))

@@ -1,6 +1,4 @@
-import numpy as np
-
-from controllers.base_controller.controller import BaseController
+from controllers.base_controller import BaseController
 from experiments.experiment import Experiment
 from topologies.awad_topology import AwadDDoSTopology
 
@@ -14,7 +12,7 @@ random rate sampled from a U[30, 60] distribution.
 
 '''
 
-class Experiment1(Experiment):
+class ExperimentDDoS(Experiment):
 
     def run(self):
         hosts = [self.net['h1'], self.net['h2'], self.net['h3'], self.net['h4'],

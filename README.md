@@ -10,6 +10,7 @@ sudo .venv/bin/python \
 ```bash
 --duration
 --seed
+--experiment_root
 --sampling_interval
 ```
 
