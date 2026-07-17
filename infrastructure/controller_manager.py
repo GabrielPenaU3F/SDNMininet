@@ -28,11 +28,11 @@ class ControllerManager:
 
     def _launch_controller(self, manager=RYU_MGR):
         controller_path = self._resolve_controller_path()
-        env_dict = Environment.get_env_dict()
+        env_dict = self._update_environment_variables()
         return subprocess.Popen(
             [
                 manager,
-                controller_path,
+                controller_path
             ], env=env_dict, cwd=self.context.experiment_root
         )
 
@@ -75,3 +75,8 @@ class ControllerManager:
     @property
     def is_running(self):
         return self._process is not None
+
+    def _update_environment_variables(self):
+        env = Environment.get_env_dict().copy()
+        env['SAMPLING_INTERVAL'] = str(self.context.sampling_interval)
+        return env

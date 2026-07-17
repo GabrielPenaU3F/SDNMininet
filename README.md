@@ -8,8 +8,9 @@ sudo .venv/bin/python \
 
 ## Currently supported options:
 ```bash
---duration <duration>
---seed <seed>
+--duration
+--seed
+--sampling_interval
 ```
 
 Experiments should be registered on experiment_register.py

@@ -18,7 +18,8 @@ class ExecutionContextFactory:
         return ExecutionContext(
             duration=args.duration,
             seed=args.seed,
-            experiment_root=experiment_root
+            experiment_root=experiment_root,
+            sampling_interval=args.sampling_interval
         )
 
     @staticmethod

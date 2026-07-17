@@ -29,6 +29,7 @@ class BaseController(app_manager.RyuApp):
         self.logger.info('Launching Ryu')
         self.mac_tables = {}
         self.switches = {}
+        self.sampling_interval = float(os.getenv('SAMPLING_INTERVAL', '1.0'))
         self._traffic_stats_csv = self._open_traffic_stats_file()
         self.csv_writer = csv.writer(self._traffic_stats_csv)
         self._setup_csv_header()
@@ -65,9 +66,10 @@ class BaseController(app_manager.RyuApp):
         # self.logger.info( f"Versión {datapath.ofproto.OFP_VERSION}")
 
         switch_id = datapath.id
-        self.switches[switch_id] = datapath # Guardamos el switch
-        self.mac_tables[switch_id] = {} # Crear tabla vacía para el switch
+        self.switches[switch_id] = datapath # Record switch
+        self.mac_tables[switch_id] = {} # Empty table for the switch
 
+        # Install necessary rules
         install_send_everything_to_controller_rule(datapath)
         install_discard_ipv6_traffic_rule(datapath)
 
@@ -119,14 +121,14 @@ class BaseController(app_manager.RyuApp):
                 switch_id,
                 stat.port_no,
                 stat.rx_packets,
-                stat.tx_packets,
+                # stat.tx_packets,
                 stat.rx_bytes,
-                stat.tx_bytes
+                # stat.tx_bytes
             ])
 
         self._traffic_stats_csv.flush()
 
-    # Metodos
+    # Methods
 
     def forward_packet(self, datapath, msg, port) -> Any:
         openflow_parser = datapath.ofproto_parser
@@ -151,23 +153,23 @@ class BaseController(app_manager.RyuApp):
         req = parser.OFPPortStatsRequest(datapath)
         datapath.send_msg(req)
 
-    # Tarea periódica: cada 1 segundo pide estadísticas a todos los switches
+    # Ask for stats
     def _monitor(self):
         while True:
             for datapath in self.switches.values():
                 self.request_port_stats(datapath)
 
-            hub.sleep(1)
+            hub.sleep(self.sampling_interval)
 
     def _setup_csv_header(self):
         self.csv_writer.writerow([
-            "timestamp",
-            "switch_id",
-            "port_no",
-            "rx_packets",
-            "tx_packets",
-            "rx_bytes",
-            "tx_bytes"
+            'timestamp',
+            'switch_id',
+            'port_no',
+            'rx_packets',
+            # "tx_packets",
+            'rx_bytes',
+            # "tx_bytes"
         ])
 
     def _signal_startup_complete(self):

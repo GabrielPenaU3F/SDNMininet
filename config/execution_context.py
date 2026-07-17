@@ -8,4 +8,5 @@ class ExecutionContext:
     duration: float
     seed: int
     experiment_root: Path
+    sampling_interval: float = 1.0
 

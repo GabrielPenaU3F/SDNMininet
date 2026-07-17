@@ -71,5 +71,12 @@ class ExperimentLauncher:
             help='Random seed for reproducible experiments'
         )
 
+        parser.add_argument(
+            '--sampling_interval',
+            type=float,
+            default=1.0,
+            help='Interval over which traffic is sampled'
+        )
+
         return parser.parse_args(argv)
 

@@ -29,7 +29,7 @@ class TestExecutionContextFactory:
         context = factory.make_context(context_args)
         assert context.duration == context_args.duration
         assert context.seed == context_args.seed
-        assert context.experiment_root == context_args.experiment_path / context_args.name
+        assert context.experiment_root == context_args.experiment_path / context_args.experiment
 
     def test_context_root_is_inside_experiments_directory(self, factory, context_args, tmp_path):
         context = factory.make_context(context_args)
