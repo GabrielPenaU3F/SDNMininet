@@ -18,7 +18,7 @@ class TestExecutionContext:
         assert execution_context.experiment_root == tmp_path
 
     def test_measurements_path_is_inside_experiment_root(self, tmp_path):
-        context = ExecutionContext(duration=0.001, seed=42, experiment_root=tmp_path)
+        context = ExecutionContext(experiment_name='dummy_experiment', duration=0.001, seed=42, experiment_root=tmp_path)
         expected = tmp_path / 'measurements'
         assert context.experiment_root / 'measurements' == expected
 

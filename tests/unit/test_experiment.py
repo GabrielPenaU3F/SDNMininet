@@ -18,6 +18,7 @@ def failing_experiment(execution_context):
 def make_dummy_experiment_with_duration(tmp_path):
     def _make(duration):
         context = ExecutionContext(
+            experiment_name='dummy_experiment',
             duration=duration,
             seed=42,
             experiment_root=tmp_path

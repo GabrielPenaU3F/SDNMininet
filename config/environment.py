@@ -1,9 +1,6 @@
 import os
 from pathlib import Path
 
-PYTHON_VENV_PATH = '/home/sskies/SDN/.venv/bin/python'
-CONTROLLER_READY_SOCK = 'temp/ryu_ready.sock'
-
 class Environment:
 
     instance = None
@@ -21,11 +18,7 @@ class Environment:
         env = os.environ.copy()
         env['PYTHONPATH'] = str(self.project_root)
         self.env = env
-        self.python_path = PYTHON_VENV_PATH
         self._create_required_directories()
-
-        # Needs the directories created
-        self.controller_ready_sock = str(self.project_root / CONTROLLER_READY_SOCK)
 
 
     # Properties
@@ -45,6 +38,18 @@ class Environment:
     @property
     def temp_path(self) -> Path:
         return self.project_root / 'temp'
+
+    @property
+    def python_path(self) -> Path:
+        return self.project_root / '.venv' / 'bin' / 'python'
+
+    @property
+    def controller_ready_sock(self) -> Path:
+        return self.temp_path / 'ryu_ready.sock'
+
+    @property
+    def ryu_manager_path(self):
+        return self.project_root / '.venv' / 'bin' / 'ryu-manager'
 
     @property
     def _required_directories(self):

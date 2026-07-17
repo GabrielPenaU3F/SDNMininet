@@ -4,7 +4,6 @@ import time
 
 from config.environment import Environment
 
-RYU_MGR = '/home/sskies/SDN/.venv/bin/ryu-manager'
 
 class ControllerManager:
 
@@ -26,12 +25,13 @@ class ControllerManager:
             self._process.wait()
             self._process = None
 
-    def _launch_controller(self, manager=RYU_MGR):
+    def _launch_controller(self):
+        ryu_manager = Environment.get_environment().ryu_manager_path
         controller_path = self._resolve_controller_path()
         env_dict = self._update_environment_variables()
         return subprocess.Popen(
             [
-                manager,
+                ryu_manager,
                 controller_path
             ], env=env_dict, cwd=self.context.experiment_root
         )
@@ -59,15 +59,16 @@ class ControllerManager:
     def _timed_out(self, deadline):
         return time.monotonic() >= deadline
 
-    def _is_controller_ready(self, socket_path) -> bool:
+    @staticmethod
+    def _is_controller_ready(socket_path) -> bool:
 
         with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as sock:
             try:
-                sock.connect(socket_path)
+                sock.connect(str(socket_path))
             except FileNotFoundError:
                 return False
 
-            return sock.recv(1024) == b"READY"
+            return sock.recv(1024) == b'READY'
 
     def _resolve_controller_path(self):
         return self.controller_cls.__module__

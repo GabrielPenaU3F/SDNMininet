@@ -16,6 +16,7 @@ class ExecutionContextFactory:
         )
 
         return ExecutionContext(
+            experiment_name=args.experiment,
             duration=args.duration,
             seed=args.seed,
             experiment_root=experiment_root,

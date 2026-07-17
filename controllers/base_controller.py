@@ -134,7 +134,8 @@ class BaseController(app_manager.RyuApp):
 
     # Methods
 
-    def forward_packet(self, datapath, msg, port) -> Any:
+    @staticmethod
+    def forward_packet(datapath, msg, port) -> Any:
         openflow_parser = datapath.ofproto_parser
 
         actions = [
@@ -152,7 +153,8 @@ class BaseController(app_manager.RyuApp):
         )
         datapath.send_msg(out)
 
-    def request_port_stats(self, datapath):
+    @staticmethod
+    def request_port_stats(datapath):
         parser = datapath.ofproto_parser
         req = parser.OFPPortStatsRequest(datapath)
         datapath.send_msg(req)
@@ -182,10 +184,9 @@ class BaseController(app_manager.RyuApp):
     def _signal_startup_complete(self):
         server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         server.settimeout(30)
-        socket_path = os.path.join(Environment.get_environment().controller_ready_sock)
-        if os.path.exists(socket_path):
-            os.unlink(socket_path)
-        server.bind(socket_path)
+        socket_path = Environment.get_environment().controller_ready_sock
+        self._unlink_socket(socket_path)
+        server.bind(str(socket_path))
         server.listen()
 
         try:
@@ -200,5 +201,9 @@ class BaseController(app_manager.RyuApp):
 
         finally:
             server.close()
-            if os.path.exists(socket_path):
-                os.unlink(socket_path)
+            self._unlink_socket(socket_path)
+
+    @staticmethod
+    def _unlink_socket(socket_path):
+        if socket_path.exists():
+            socket_path.unlink()
