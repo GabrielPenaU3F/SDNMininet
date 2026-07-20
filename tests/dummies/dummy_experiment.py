@@ -8,8 +8,8 @@ class DummyExperiment(Experiment):
     controller_cls = DummyController
     topology_cls = DummyTopology
 
-    def __init__(self, context):
-        super().__init__(context)
+    def __init__(self, config):
+        super().__init__(config)
         self.run_called = False
 
     def run(self):
@@ -22,4 +22,4 @@ class FailingExperiment(Experiment):
     topology_cls = DummyTopology
 
     def run(self):
-        raise RuntimeError("boom")
+        raise RuntimeError('boom')

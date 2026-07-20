@@ -2,28 +2,29 @@ from unittest.mock import Mock
 
 import pytest
 
-from config.execution_context import ExecutionContext
+from config.experiment_config import ExperimentConfig
 from tests.dummies.dummy_experiment import DummyExperiment, FailingExperiment
 
 
 @pytest.fixture
-def dummy_experiment(execution_context):
-    return DummyExperiment(execution_context)
+def dummy_experiment(experiment_config):
+    return DummyExperiment(experiment_config)
 
 @pytest.fixture
-def failing_experiment(execution_context):
-    return FailingExperiment(execution_context)
+def failing_experiment(experiment_config):
+    return FailingExperiment(experiment_config)
 
 @pytest.fixture
 def make_dummy_experiment_with_duration(tmp_path):
     def _make(duration):
-        context = ExecutionContext(
+        config = ExperimentConfig(
             experiment_name='dummy_experiment',
             duration=duration,
             seed=42,
+            sampling_interval=0.1,
             experiment_root=tmp_path
         )
-        return DummyExperiment(context)
+        return DummyExperiment(config)
     return _make
 
 

@@ -2,7 +2,7 @@ import argparse
 import os
 import sys
 
-from config.execution_context_factory import ExecutionContextFactory
+from config.experiment_config import ExperimentConfig
 
 
 class ExperimentLauncher:
@@ -15,8 +15,8 @@ class ExperimentLauncher:
         self._validate_args(args)
         self._ensure_root()
 
-        context = ExecutionContextFactory().make_context(args)
-        experiment = self._load_experiment(args.experiment, context)
+        config = ExperimentConfig.from_args(args)
+        experiment = self._load_experiment(args.experiment, config)
 
         print('Launching experiment')
         experiment.execute()

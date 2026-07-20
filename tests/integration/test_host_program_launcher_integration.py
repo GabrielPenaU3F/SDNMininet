@@ -19,7 +19,7 @@ class HostProgramIntegrationExperiment(Experiment):
     def run(self):
         h1 = self.net.get('h1')
 
-        launcher = HostProgramLauncher(self.context)
+        launcher = HostProgramLauncher(self.config)
         launcher.launch(
             h1,
             'tests/integration/scripts/create_file.py'
@@ -32,7 +32,7 @@ class TestHostProgramLauncherIntegration:
         experiment = make_experiment(HostProgramIntegrationExperiment)
         experiment.execute()
         assert Path(
-                experiment.context.experiment_root
+                experiment.config.experiment_root
                 / 'measurements'
                 / 'host_program.txt'
         ).exists()

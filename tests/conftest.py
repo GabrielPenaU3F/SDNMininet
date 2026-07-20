@@ -2,15 +2,14 @@ from argparse import Namespace
 
 import pytest
 
-from config.execution_context import ExecutionContext
+from config.experiment_config import ExperimentConfig
 
 
 @pytest.fixture
-def execution_context(tmp_path):
-    return ExecutionContext(experiment_name='dummy_experiment',
-                            duration=0.001, seed=42, experiment_root=tmp_path)
+def experiment_config(args_namespace):
+    return ExperimentConfig.from_args(args_namespace)
 
 @pytest.fixture
-def context_args(tmp_path):
+def args_namespace(tmp_path):
     return Namespace(experiment='dummy_experiment', duration=0.001, seed=42, experiment_path=tmp_path,
                      sampling_interval=1.0)

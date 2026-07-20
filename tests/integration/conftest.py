@@ -1,11 +1,10 @@
 import pytest
 
 from config.environment import Environment
-from config.execution_context_factory import ExecutionContextFactory
 
 
 @pytest.fixture
-def make_experiment(context_args, tmp_path):
+def make_experiment(experiment_config, tmp_path):
     def _make(experiment_cls):
         tmp_root = tmp_path
 
@@ -14,6 +13,6 @@ def make_experiment(context_args, tmp_path):
             project_root=None,
             experiment_root=tmp_root
         )
-        context = ExecutionContextFactory().make_context(context_args)
-        return experiment_cls(context)
+
+        return experiment_cls(experiment_config)
     return _make

@@ -12,12 +12,12 @@ from launchers.host_program_launcher import HostProgramLauncher
 
 class Experiment(ABC):
 
-    def __init__(self, context, **kwargs):
-        self.context = context
-        self.rng = np.random.default_rng(seed=self.context.seed)
-        self.program_launcher = HostProgramLauncher(self.context)
+    def __init__(self, config, **kwargs):
+        self.config = config
+        self.rng = np.random.default_rng(seed=self.config.seed)
+        self.program_launcher = HostProgramLauncher(self.config)
         self.network_mgr = NetworkManager(self.topology_cls, **kwargs)
-        self.controller_mgr = ControllerManager(self.controller_cls, context, **kwargs)
+        self.controller_mgr = ControllerManager(self.controller_cls, config, **kwargs)
 
     def execute(self):
         self.deploy_infrastructure()
@@ -42,7 +42,7 @@ class Experiment(ABC):
         mn_clean.cleanup()
 
     def _wait_until_finished(self):
-        deadline = time.monotonic() + self.context.duration
+        deadline = time.monotonic() + self.config.duration
 
         while time.monotonic() < deadline:
             time.sleep(0.5)
