@@ -1,11 +1,14 @@
+from config.experiment_config import ExperimentConfig
 from controllers.base_controller import BaseController
 from infrastructure.controller_manager import ControllerManager
 
 
 class TestControllerManagerIntegration:
 
-    def test_controller_manager_starts_real_controller(self, experiment_config):
-        manager = ControllerManager(BaseController, experiment_config)
+    def test_controller_manager_starts_real_controller(self, tmp_path):
+        ExperimentConfig('dummy_experiment', experiment_root=tmp_path) # To ensure directories are created
+        experiment_root = tmp_path / 'dummy_experiment'
+        manager = ControllerManager(BaseController, experiment_root)
         manager.start()
         assert manager.is_running
         manager.stop()

@@ -17,7 +17,7 @@ class Experiment(ABC):
         self.rng = np.random.default_rng(seed=self.config.seed)
         self.program_launcher = HostProgramLauncher(self.config)
         self.network_mgr = NetworkManager(self.topology_cls, **kwargs)
-        self.controller_mgr = ControllerManager(self.controller_cls, config, **kwargs)
+        self.controller_mgr = ControllerManager(self.controller_cls, config.experiment_root, **kwargs)
 
     def execute(self):
         self.deploy_infrastructure()

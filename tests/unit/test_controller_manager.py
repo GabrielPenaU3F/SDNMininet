@@ -8,8 +8,8 @@ from tests.dummies.dummy_controller import DummyController
 
 @pytest.fixture
 def controller_manager():
-    context = Mock()
-    manager = ControllerManager(DummyController, context)
+    exp_root = Mock()
+    manager = ControllerManager(DummyController, exp_root)
     yield manager
 
     if manager.is_running:

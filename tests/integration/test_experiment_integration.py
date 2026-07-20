@@ -23,7 +23,6 @@ class IntegrationTestExperiment(Experiment):
 
     @property
     def controller_cls(self):
-        print(BaseController.__module__)
         return BaseController
 
     @property

@@ -7,9 +7,9 @@ from config.environment import Environment
 
 class ControllerManager:
 
-    def __init__(self, controller_cls, experiment_config, timeout=30):
+    def __init__(self, controller_cls, experiment_root, timeout=30):
         self.controller_cls = controller_cls
-        self.experiment_config = experiment_config
+        self.experiment_root = experiment_root
         self._timeout = timeout
         self._process = None
 
@@ -26,14 +26,14 @@ class ControllerManager:
             self._process = None
 
     def _launch_controller(self):
-        ryu_manager = Environment.get_environment().ryu_manager_path
+        env = Environment.get_environment()
+        ryu_manager = env.ryu_manager_path
         controller_path = self._resolve_controller_path()
-        env_dict = self._update_environment_variables()
         return subprocess.Popen(
             [
                 ryu_manager,
                 controller_path
-            ], env=env_dict, cwd=self.experiment_config.experiment_root
+            ], env=env.get_env_dict(), cwd=self.experiment_root
         )
 
     def _wait_until_ready(self):
@@ -76,8 +76,3 @@ class ControllerManager:
     @property
     def is_running(self):
         return self._process is not None
-
-    def _update_environment_variables(self):
-        env = Environment.get_env_dict().copy()
-        env['SAMPLING_INTERVAL'] = str(self.experiment_config.sampling_interval)
-        return env
