@@ -23,7 +23,7 @@ if [[ "$ID" != "ubuntu" ]]; then
     exit 1
 fi
 
-echo "This project was developed and tested on Ubuntu 26.04 LTS."
+echo "This project was developed and tested on Ubuntu 25.04 LTS."
 echo "Other Ubuntu versions may work but are not officially supported."
 echo
 
