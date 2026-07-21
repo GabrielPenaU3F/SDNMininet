@@ -25,10 +25,13 @@ class Experiment(ABC):
             self.run()
             self._wait_until_finished()
         finally:
+            self.config.delete_config_file()
             self.shutdown()
 
     def deploy_infrastructure(self, **kwargs):
         self._clean_sdn()
+        self.config.write_config_file()
+
         self.controller_mgr.start()
         self.network_mgr.build_network(**kwargs)
         self.network_mgr.start()

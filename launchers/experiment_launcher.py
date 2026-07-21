@@ -14,17 +14,24 @@ class ExperimentLauncher:
         args = self._parse_args(argv)
         self._validate_args(args)
         self._ensure_root()
-
         config = ExperimentConfig.from_args(args)
-        experiment = self._load_experiment(args.experiment, config)
+        self._launch(config)
 
-        print('Launching experiment')
-        experiment.execute()
-        print('Experiment complete')
+    def _launch(self, config: ExperimentConfig):
 
-    def _load_experiment(self, name, context):
-        experiment_cls = self._experiments[name]
-        return experiment_cls(context)
+        try:
+            experiment = self._load_experiment(config)
+
+            print('Launching experiment')
+            experiment.execute()
+            print('Experiment complete')
+
+        finally:
+            config.delete_config_file()
+
+    def _load_experiment(self, config):
+        experiment_cls = self._experiments[config.experiment_name]
+        return experiment_cls(config)
 
     def _show_available_experiments(self):
         print('Available experiments:')

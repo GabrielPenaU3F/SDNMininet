@@ -26,7 +26,7 @@ def launcher():
 class TestLoadExperiment:
 
     def test_load_existing_experiment(self, launcher, experiment_config):
-        experiment = launcher._load_experiment('dummy_experiment', experiment_config)
+        experiment = launcher._load_experiment(experiment_config)
         assert isinstance(experiment, DummyExperiment)
 
     def test_validate_rejects_unknown_experiment(self, launcher, capsys):

@@ -1,7 +1,9 @@
 import csv
+import json
 import os
 import socket
 import time
+from pathlib import Path
 from typing import Any
 
 from ryu.base import app_manager
@@ -31,9 +33,11 @@ class BaseController(app_manager.RyuApp):
         self.switches = {}
         self.current_poll_id = 0
         self.switch_poll = {}
-        self.sampling_interval = float(os.getenv('SAMPLING_INTERVAL', '1.0'))
+        # self.sampling_interval = float(os.getenv('SAMPLING_INTERVAL', '1.0'))
         self._traffic_stats_csv = self._open_traffic_stats_file()
         self.csv_writer = csv.writer(self._traffic_stats_csv)
+
+        self._load_config()
         self._setup_csv_header()
 
     @staticmethod
@@ -207,3 +211,12 @@ class BaseController(app_manager.RyuApp):
     def _unlink_socket(socket_path):
         if socket_path.exists():
             socket_path.unlink()
+
+    def _load_config(self):
+        experiment_name = Path.cwd().name
+        config_file = Environment.get_environment().temp_path / f'{experiment_name}_cfg.json'
+        with config_file.open() as f:
+            cfg = json.load(f)
+
+        self.sampling_interval = cfg['sampling_interval']
+        self.seed = cfg['seed']

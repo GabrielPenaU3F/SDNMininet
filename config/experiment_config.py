@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 from typing import Optional
 
@@ -41,17 +42,29 @@ class ExperimentConfig:
 
         return Path(experiment_root) / experiment_name
 
-
     def _initialize_experiment_root_directory(self):
         self.measurements_path.mkdir(
             parents=True,
             exist_ok=True
         )
 
+    def write_config_file(self):
+        with self.config_file.open('w') as f:
+            json.dump(
+                {
+                    'sampling_interval': self.sampling_interval,
+                    'seed': self.seed,
+                }, f, indent=4,
+            )
+
+    def delete_config_file(self):
+        if self.config_file.exists():
+            self.config_file.unlink()
+
     # Properties
 
     @property
-    def controller_config_file(self):
+    def config_file(self):
         return (
             Environment.get_environment().temp_path
             / f'{self.experiment_name}_cfg.json'

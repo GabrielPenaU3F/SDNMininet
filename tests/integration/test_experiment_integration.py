@@ -3,6 +3,8 @@ from pathlib import Path
 
 import csv
 
+import pandas as pd
+
 from controllers.base_controller import BaseController
 from experiments.experiment import Experiment
 from topologies.simple_topology import SimpleTopology
@@ -35,6 +37,20 @@ class IntegrationTestExperiment(Experiment):
         time.sleep(2)
 
 
+class SamplingIntervalExperiment(Experiment):
+
+    @property
+    def controller_cls(self):
+        return BaseController
+
+    @property
+    def topology_cls(self):
+        return SimpleTopology
+
+    def run(self):
+        time.sleep(0.5)
+
+
 class TestExperimentIntegration:
 
     def test_experiment_deploys_real_infrastructure(self, make_experiment, tmp_path):
@@ -44,3 +60,18 @@ class TestExperimentIntegration:
 
         assert stats_csv.exists()
         assert csv_has_at_least_one_data_row(stats_csv)
+
+    def test_controller_receives_sampling_interval(self, make_experiment, tmp_path):
+        experiment = make_experiment(
+            SamplingIntervalExperiment,
+            sampling_interval=0.05,
+            duration=0.5,
+            experiment_root=tmp_path,
+        )
+
+        experiment.execute()
+        df = pd.read_csv(
+            experiment.config.measurements_path / 'traffic_stats.csv'
+        )
+
+        assert df['poll_id'].max() > 10 # should be a large number of polls

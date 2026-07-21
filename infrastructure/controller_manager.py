@@ -56,7 +56,8 @@ class ControllerManager:
     def _is_process_alive(self) -> bool:
         return self._process.poll() is None
 
-    def _timed_out(self, deadline):
+    @staticmethod
+    def _timed_out(deadline):
         return time.monotonic() >= deadline
 
     @staticmethod
