@@ -8,8 +8,7 @@ from tests.dummies.dummy_controller import DummyController
 
 @pytest.fixture
 def controller_manager():
-    exp_root = Mock()
-    manager = ControllerManager(DummyController, exp_root)
+    manager = ControllerManager(DummyController)
     yield manager
 
     if manager.is_running:
@@ -58,13 +57,13 @@ class TestStart:
             Mock()
         )
 
-        controller_manager.start()
+        controller_manager.start(Mock())
         assert controller_manager._process is process
 
     def test_start_raises_if_controller_is_already_running(self, controller_manager):
         controller_manager._process = Mock()
         with pytest.raises(RuntimeError, match='Controller already running. Terminate before re-launching'):
-            controller_manager.start()
+            controller_manager.start(Mock())
 
     def test_start_propagates_controller_startup_failure(self, monkeypatch, controller_manager):
         process = Mock()
@@ -82,7 +81,7 @@ class TestStart:
         )
 
         with pytest.raises(RuntimeError):
-            controller_manager.start()
+            controller_manager.start(Mock())
 
 
 class TestWaitUntilReady:
@@ -104,7 +103,7 @@ class TestWaitUntilReady:
             wait
         )
 
-        controller_manager.start()
+        controller_manager.start(Mock())
         wait.assert_called_once()
 
     def test_wait_until_ready_returns_when_controller_becomes_ready(self, controller_manager, monkeypatch):

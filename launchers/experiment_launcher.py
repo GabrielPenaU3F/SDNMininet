@@ -18,16 +18,10 @@ class ExperimentLauncher:
         self._launch(config)
 
     def _launch(self, config: ExperimentConfig):
-
-        try:
-            experiment = self._load_experiment(config)
-
-            print('Launching experiment')
-            experiment.execute()
-            print('Experiment complete')
-
-        finally:
-            config.delete_config_file()
+        experiment = self._load_experiment(config)
+        print('Launching experiment')
+        experiment.execute()
+        print('Experiment complete')
 
     def _load_experiment(self, config):
         experiment_cls = self._experiments[config.experiment_name]

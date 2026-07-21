@@ -13,7 +13,7 @@ random rate sampled from a U[30, 60] distribution.
 
 class Experiment1(Experiment):
 
-    def run(self):
+    def begin(self):
         hosts = [self.net['h1'], self.net['h2'], self.net['h3'], self.net['h4'],
                  self.net['h5'], self.net['h6'], self.net['h7'], self.net['h8']]
         rates = self.rng.uniform(0, 10, 8)

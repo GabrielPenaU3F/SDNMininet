@@ -16,7 +16,7 @@ class HostProgramIntegrationExperiment(Experiment):
     def topology_cls(self):
         return SimpleTopology
 
-    def run(self):
+    def begin(self):
         h1 = self.net.get('h1')
 
         launcher = HostProgramLauncher(self.config)

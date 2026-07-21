@@ -10,11 +10,11 @@ class Host:
     def run(self):
 
         receiver_thread = threading.Thread(
-            target=self.receiver.run
+            target=self.receiver.begin
         )
 
         sender_thread = threading.Thread(
-            target=self.sender.run
+            target=self.sender.begin
         )
 
         receiver_thread.start()

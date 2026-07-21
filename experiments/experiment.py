@@ -16,23 +16,21 @@ class Experiment(ABC):
         self.config = config
         self.rng = np.random.default_rng(seed=self.config.seed)
         self.program_launcher = HostProgramLauncher(self.config)
-        self.network_mgr = NetworkManager(self.topology_cls, **kwargs)
-        self.controller_mgr = ControllerManager(self.controller_cls, config.experiment_root, **kwargs)
+        self.network_mgr = NetworkManager(self.topology_cls)
+        self.controller_mgr = ControllerManager(self.controller_cls)
 
     def execute(self):
-        self.deploy_infrastructure()
-        try:
-            self.run()
-            self._wait_until_finished()
-        finally:
-            self.config.delete_config_file()
-            self.shutdown()
+        with self.config.config_context():
+            self.deploy_infrastructure()
+            try:
+                self.begin()
+                self._wait_until_finished()
+            finally:
+                self.shutdown()
 
     def deploy_infrastructure(self, **kwargs):
         self._clean_sdn()
-        self.config.write_config_file()
-
-        self.controller_mgr.start()
+        self.controller_mgr.start(self.config)
         self.network_mgr.build_network(**kwargs)
         self.network_mgr.start()
 
@@ -57,7 +55,7 @@ class Experiment(ABC):
     # === To be implemented by each subclass ===
 
     @abstractmethod
-    def run(self):
+    def begin(self):
         pass
 
     @property

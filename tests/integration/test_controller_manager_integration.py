@@ -7,14 +7,10 @@ class TestControllerManagerIntegration:
 
     def test_controller_manager_starts_real_controller(self, tmp_path):
         config = ExperimentConfig('dummy_experiment', experiment_root=tmp_path) # To ensure directories are created
-        try:
+        with config.config_context():
             config.write_config_file()
-            experiment_root = tmp_path / 'dummy_experiment'
-            manager = ControllerManager(BaseController, experiment_root)
-            manager.start()
+            manager = ControllerManager(BaseController)
+            manager.start(config)
             assert manager.is_running
             manager.stop()
             assert not manager.is_running
-
-        finally:
-            config.delete_config_file()

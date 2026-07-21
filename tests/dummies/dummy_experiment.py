@@ -12,7 +12,7 @@ class DummyExperiment(Experiment):
         super().__init__(config)
         self.run_called = False
 
-    def run(self):
+    def begin(self):
         self.run_called = True
 
 
@@ -21,5 +21,5 @@ class FailingExperiment(Experiment):
     controller_cls = DummyController
     topology_cls = DummyTopology
 
-    def run(self):
+    def begin(self):
         raise RuntimeError('boom')

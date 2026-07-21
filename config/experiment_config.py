@@ -1,4 +1,5 @@
 import json
+from contextlib import contextmanager
 from pathlib import Path
 from typing import Optional
 
@@ -47,6 +48,14 @@ class ExperimentConfig:
             parents=True,
             exist_ok=True
         )
+
+    @contextmanager
+    def config_context(self):
+        self.write_config_file()
+        try:
+            yield
+        finally:
+            self.delete_config_file()
 
     def write_config_file(self):
         with self.config_file.open('w') as f:

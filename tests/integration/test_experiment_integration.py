@@ -31,7 +31,7 @@ class IntegrationTestExperiment(Experiment):
     def topology_cls(self):
         return SimpleTopology
 
-    def run(self):
+    def begin(self):
         h1 = self.net.get('h1')
         h1.cmd('ping -c 3 h2')
         time.sleep(2)
@@ -47,7 +47,7 @@ class SamplingIntervalExperiment(Experiment):
     def topology_cls(self):
         return SimpleTopology
 
-    def run(self):
+    def begin(self):
         time.sleep(0.5)
 
 

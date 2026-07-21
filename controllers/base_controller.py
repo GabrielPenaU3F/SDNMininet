@@ -33,7 +33,6 @@ class BaseController(app_manager.RyuApp):
         self.switches = {}
         self.current_poll_id = 0
         self.switch_poll = {}
-        # self.sampling_interval = float(os.getenv('SAMPLING_INTERVAL', '1.0'))
         self._traffic_stats_csv = self._open_traffic_stats_file()
         self.csv_writer = csv.writer(self._traffic_stats_csv)
 

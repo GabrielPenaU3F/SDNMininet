@@ -3,20 +3,20 @@ import subprocess
 import time
 
 from config.environment import Environment
+from config.experiment_config import ExperimentConfig
 
 
 class ControllerManager:
 
-    def __init__(self, controller_cls, experiment_root, timeout=30):
+    def __init__(self, controller_cls, timeout=30):
         self.controller_cls = controller_cls
-        self.experiment_root = experiment_root
         self._timeout = timeout
         self._process = None
 
-    def start(self):
+    def start(self, config: ExperimentConfig):
         if self._process:
             raise RuntimeError('Controller already running. Terminate before re-launching')
-        self._process = self._launch_controller()
+        self._process = self._launch_controller(config)
         self._wait_until_ready()
 
     def stop(self):
@@ -25,7 +25,7 @@ class ControllerManager:
             self._process.wait()
             self._process = None
 
-    def _launch_controller(self):
+    def _launch_controller(self, config):
         env = Environment.get_environment()
         ryu_manager = env.ryu_manager_path
         controller_path = self._resolve_controller_path()
@@ -33,7 +33,7 @@ class ControllerManager:
             [
                 ryu_manager,
                 controller_path
-            ], env=env.get_env_dict(), cwd=self.experiment_root
+            ], env=env.get_env_dict(), cwd=config.experiment_root
         )
 
     def _wait_until_ready(self):
