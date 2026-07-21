@@ -20,7 +20,6 @@ class Environment:
         self.env = env
         self._create_required_directories()
 
-
     # Properties
 
     @property
@@ -50,6 +49,10 @@ class Environment:
     @property
     def ryu_manager_path(self):
         return self.project_root / '.venv' / 'bin' / 'ryu-manager'
+
+    @property
+    def shared_host_programs_path(self):
+        return self.experiments_path / 'shared_host_programs'
 
     @property
     def _required_directories(self):
