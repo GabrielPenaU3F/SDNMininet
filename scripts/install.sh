@@ -58,8 +58,11 @@ echo "Done"
 echo
 
 echo "[5/6] Installing Ryu..."
-uv pip install setuptools==56.0.0
-uv pip install git+https://github.com/faucetsdn/ryu.git --no-build-isolation
+git clone https://github.com/faucetsdn/ryu.git
+pushd ryu
+python setup.py install
+popd
+sudo rm -rf ryu
 echo "Done"
 echo
 

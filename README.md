@@ -1,3 +1,11 @@
+# INSTALLATION
+```bash
+git clone https://github.com/GabrielPenaU3F/SDNMininet
+cd SDNMininet
+chmod +x scripts/install.sh
+./scripts/install.sh
+```
+
 # HOW TO RUN
 From a console on the project root directory run:
 
