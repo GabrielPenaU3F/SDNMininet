@@ -1,4 +1,6 @@
 # INSTALLATION
+
+Do not install with root. Just run the following:
 ```bash
 git clone https://github.com/GabrielPenaU3F/SDNMininet
 cd SDNMininet
