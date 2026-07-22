@@ -62,6 +62,9 @@ uv pip install -e .
 echo "Done"
 echo
 
+echo "Done"
+echo
+
 echo "[6/6] Installing Ryu..."
 uv pip install git+https://github.com/faucetsdn/ryu.git
 
