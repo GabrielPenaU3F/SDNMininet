@@ -12,6 +12,11 @@ if [[ ! -f /etc/os-release ]]; then
     exit 1
 fi
 
+if [[ "$EUID" -eq 0 ]]; then
+    echo "Do not run this installer as root."
+    exit 1
+fi
+
 source /etc/os-release
 
 echo "Detected: $PRETTY_NAME"
@@ -40,11 +45,13 @@ sudo apt install -y git curl mininet
 echo "Done"
 echo
 
-echo "[2/6] Installing uv..."
-curl -LsSf https://astral.sh/uv/install.sh | sh
-source ~/.local/bin/env
-echo "Done"
-echo
+if ! command -v uv >/dev/null 2>&1; then
+    echo "[2/6] Installing uv..."
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+    source ~/.local/bin/env
+    echo "Done"
+    echo
+fi
 
 echo "[3/6] Installing Python 3.8..."
 uv python install 3.8
@@ -64,13 +71,22 @@ git clone https://github.com/faucetsdn/ryu.git
 pushd ryu
 uv run --with setuptools python setup.py install
 popd
-sudo rm -rf ryu
+rm -rf ryu
 echo "Done"
 echo
 
 echo "[6/6] Resolving dependencies..."
 python -m pip install -r requirements.txt
+python -m pip install -r requirements-ryu.txt
 echo "Done"
 echo
 
-echo "Installation complete"
+echo
+echo "========================================="
+echo "Installation completed successfully."
+echo
+echo "To activate the environment:"
+echo
+echo "    source .venv/bin/activate"
+echo
+echo "========================================="
