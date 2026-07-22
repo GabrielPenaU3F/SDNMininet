@@ -58,8 +58,8 @@ echo "Done"
 echo
 
 echo "[5/6] Installing Ryu..."
-python -m pip install setuptools==56.0.0
-python -m pip install git+https://github.com/faucetsdn/ryu.git
+uv pip install setuptools==56.0.0
+uv pip install git+https://github.com/faucetsdn/ryu.git --no-build-isolation
 echo "Done"
 echo
 
