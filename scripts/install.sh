@@ -57,12 +57,12 @@ source .venv/bin/activate
 echo "Done"
 echo
 
-echo "[5/6] Installing Ryu..."
-uv pip install git+https://github.com/faucetsdn/ryu.git
-
-echo "[6/6] Resolving dependencies..."
+echo "[5/6] Resolving dependencies..."
 uv pip install -e .
 echo "Done"
 echo
+
+echo "[6/6] Installing Ryu..."
+uv pip install git+https://github.com/faucetsdn/ryu.git
 
 echo "Installation complete"
