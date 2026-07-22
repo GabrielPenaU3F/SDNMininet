@@ -54,7 +54,8 @@ echo
 echo "[4/6] Setting up environment..."
 uv venv --python 3.8
 source .venv/bin/activate
-uv pip install setuptools==56.0.0
+python -m ensurepip --upgrade
+python -m pip install setuptools==56.0.0
 echo "Done"
 echo
 
