@@ -1,0 +1,5 @@
+# Do not include Ryu; should be installed externally
+
+mininet==2.3.0.dev6
+numpy==1.24.4
+pandas==2.0.3
