@@ -60,7 +60,7 @@ echo
 echo "[5/6] Installing Ryu..."
 git clone https://github.com/faucetsdn/ryu.git
 pushd ryu
-python setup.py install
+uv run --with setuptools python setup.py install
 popd
 sudo rm -rf ryu
 echo "Done"
