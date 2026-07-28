@@ -1,10 +1,14 @@
 # Ryu must be installed externally, as done in the install script
 
+# Mandatory requirements
 mininet==2.3.0.dev6
 numpy==1.24.4
 pandas==2.0.3
 
-# Optional: install if you want to test
+# For analysis
+scipy==1.10.1
+matplotlib==3.7.5
+PyQt6==6.7.1
 
 #pytest==8.3.5
 #debugpy==1.8.21

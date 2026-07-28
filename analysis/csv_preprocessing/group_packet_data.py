@@ -37,51 +37,51 @@ def normalize_traffic_statistics(input_csv: Path, output_csv: Path,
 
     # Optional filtering
     if switch_id != -1:
-        df = df[df["switch_id"] == switch_id]
+        df = df[df['switch_id'] == switch_id]
 
     if df.empty:
-        raise ValueError("No measurements remain after filtering.")
+        raise ValueError('No measurements remain after filtering')
 
     # Normalize timestamps
-    t0 = df["timestamp"].min()
-    df["timestamp"] = (df["timestamp"] - t0) * timestamp_scale
+    t0 = df['timestamp'].min()
+    df['timestamp'] = (df['timestamp'] - t0) * timestamp_scale
 
     # Keep the last measurement for each (poll, switch, port)
     df = (
-        df.sort_values("timestamp")
+        df.sort_values('timestamp')
         .groupby(
-            ["poll_id", "switch_id", "port_no"],
+            ['poll_id', 'switch_id', 'port_no'],
             as_index=False
         )
         .last()
     )
 
     # Remove incomplete polling rounds
-    rows_per_poll = df.groupby("poll_id").size()
+    rows_per_poll = df.groupby('poll_id').size()
     expected_rows = rows_per_poll.max()
 
     valid_polls = rows_per_poll[rows_per_poll == expected_rows].index
 
-    df = df[df["poll_id"].isin(valid_polls)]
+    df = df[df['poll_id'].isin(valid_polls)]
 
     # Aggregate counters across ports
     df = (
-        df.groupby("poll_id", as_index=False)
+        df.groupby('poll_id', as_index=False)
         .agg(
-            timestamp=("timestamp", "min"),
-            packets=("rx_packets", "sum"),
+            timestamp=('timestamp', 'min'),
+            packets=('rx_packets', 'sum'),
         )
     )
 
     # Optional: translate counter so it starts at zero
     if from_zero:
-        df["packets"] -= df["packets"].iloc[0]
+        df['packets'] -= df['packets'].iloc[0]
 
     # Round timestamps
-    df["timestamp"] = df["timestamp"].round(3)
+    df['timestamp'] = df['timestamp'].round(3)
 
     # Remove poll_id
-    df = df[["timestamp", "packets"]]
+    df = df[['timestamp', 'packets']]
 
     df.to_csv(output_csv, index=False)
 
