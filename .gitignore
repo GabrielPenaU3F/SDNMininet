@@ -146,3 +146,6 @@ http-client.private.env.json
 
 # My notes file
 notas.md
+
+# Directory I do not wish to track
+debug_etc/

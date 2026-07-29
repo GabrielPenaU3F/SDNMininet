@@ -10,5 +10,6 @@ scipy==1.10.1
 matplotlib==3.7.5
 PyQt6==6.7.1
 
-#pytest==8.3.5
-#debugpy==1.8.21
+# To run tests and debug
+pytest==8.3.5
+debugpy==1.8.21

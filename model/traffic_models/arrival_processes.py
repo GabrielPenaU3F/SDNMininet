@@ -6,26 +6,38 @@ from scipy.optimize import curve_fit
 
 class ArrivalProcess(ABC):
 
-    def __init__(self, seed=0, **kwargs):
-        self.initial_state = 0
-        self.rng = np.random.default_rng(seed)
+    def __init__(self, seed=0, initial_state=0, **kwargs):
+        self._validate_model_parameters()
+        self._initial_state = initial_state
+        self._rng = np.random.default_rng(seed)
+
+    @staticmethod
+    @abstractmethod
+    def mvf_function(t, *params):
+        pass
+
+    @abstractmethod
+    def _validate_model_parameters(self):
+        pass
+
 
     @abstractmethod
     def interarrival_time(self, *args) -> float:
         pass
 
-    @abstractmethod
-    def mvf(self, t, *args, **kwargs):
-        pass
+    def mvf(self, t):
+        return self._initial_state + self.mvf_function(t, *self.parameters)
 
     def fit(self, x, y):
-       optimal_params, cov = curve_fit(self.mvf, x, y, p0=self.model_params,
-                                       method='trf', bounds=self.bounds)
+       optimal_params, cov = curve_fit(self.mvf_function, x, y,
+                                       p0=self.parameters,
+                                       method='trf',
+                                       bounds=self.bounds)
        return tuple(optimal_params)
 
     @property
     @abstractmethod
-    def model_params(self):
+    def parameters(self):
         pass
 
     @property
@@ -36,20 +48,26 @@ class ArrivalProcess(ABC):
 
 class PoissonProcess(ArrivalProcess):
 
-    def __init__(self, rate, seed=0, **kwargs):
-        super().__init__(seed=seed, **kwargs)
+    def __init__(self, rate, seed=0, initial_state=0):
         self.rate = rate
+
+        super().__init__(seed=seed, initial_state=initial_state)
 
     def interarrival_time(self, *args) -> float:
         scale = 1 / self.rate
-        return self.rng.exponential(scale)
+        return self._rng.exponential(scale)
 
-    def mvf(self, t, lam, *args, **kwargs):
+    @staticmethod
+    def mvf_function(t, lam):
         return lam * t
 
+    def _validate_model_parameters(self):
+        if not self.rate > 0:
+            raise ValueError('Poisson rate must be strictly positive')
+
     @property
-    def model_params(self):
-        return self.rate
+    def parameters(self):
+        return (self.rate,)
 
     @property
     def bounds(self):
@@ -58,18 +76,18 @@ class PoissonProcess(ArrivalProcess):
 
 class BPM3pProcess(ArrivalProcess):
 
-    def __init__(self, beta, gamma, rho, seed=0, initial_state=0, **kwargs):
-        super().__init__(seed=seed, **kwargs)
-        self._validate_model_parameters(beta, gamma, rho)
+    def __init__(self, beta, gamma, rho, seed=0, initial_state=0):
         self.beta = beta
         self.gamma = gamma
         self.rho = rho
-        self.initial_state = initial_state
 
-    def mvf(self, t, gamma, beta, rho, *args, **kwargs):
+        super().__init__(seed=seed, initial_state=initial_state)
+
+    @staticmethod
+    def mvf_function(t, beta, gamma, rho):
         r = beta / gamma
-        p = np.exp(-gamma * self._Kappa_s_t(0, t, rho))
-        return self.initial_state + r * (1 - p) / p
+        p = np.exp(-gamma * BPM3pProcess._Kappa_s_t(0, t, rho))
+        return r * (1 - p) / p
 
     def interarrival_time(self, k, s) -> float:
         return self._inverse_cdf(self.gamma, self.beta, self.rho, k, s)
@@ -82,21 +100,18 @@ class BPM3pProcess(ArrivalProcess):
     def _Kappa_s_t(s, t, rho):
         return (1/rho) * np.log((1 + rho * t)/(1 + rho * s))
 
-    @staticmethod
-    def _validate_model_parameters(beta, gamma, rho):
-        if not rho > 0:
+    def _validate_model_parameters(self):
+        if any(x <= 0 for x in (self.beta, self.gamma, self.rho)):
             raise ValueError('BPM-3p parameters must be strictly positive')
-        return gamma, beta, rho
 
-    @staticmethod
-    def _inverse_cdf(gamma, beta, rho, k, s):
-        random = np.random.rand()
+    def _inverse_cdf(self, gamma, beta, rho, k, s):
+        random = self._rng.random()
         exponent = -rho / (beta + gamma * k)
         second_factor = np.power(1 - random, exponent)
         return ((1 + rho * s) * second_factor - 1) / rho
 
     @property
-    def model_params(self):
+    def parameters(self):
         return self.beta, self.gamma, self.rho
 
     @property

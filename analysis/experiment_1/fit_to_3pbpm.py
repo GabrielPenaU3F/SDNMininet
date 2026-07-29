@@ -6,7 +6,6 @@ import matplotlib
 matplotlib.use('QtAgg')
 from matplotlib import pyplot as plt
 
-from config.environment import Environment
 from model.traffic_models.arrival_processes import BPM3pProcess
 
 
@@ -32,7 +31,7 @@ if __name__ == '__main__':
     print(f'H = {gamma/rho}')
 
     model = BPM3pProcess(beta, gamma, rho, seed=seed)
-    y_pred = model.mvf(x, beta, gamma, rho)
+    y_pred = model.mvf(x)
 
     plt.plot(x, y, linestyle='--', label='Data')
     plt.plot(x, y_pred, linestyle='-', label='MVF')
