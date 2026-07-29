@@ -12,10 +12,11 @@ if __name__ == '__main__':
     parser.add_argument('--dst_ip', required=True, type=str)
     parser.add_argument('--port', required=True, type=int)
     parser.add_argument('--rate', required=True, type=float)
+    parser.add_argument('--seed', default=0, type=int)
 
     # Parse
     args = parser.parse_args()
-    process = PoissonProcess(args.rate)
+    process = PoissonProcess(args.rate, seed=args.seed)
 
     # Create UDP sender and receiver
     sender = UDPSender(

@@ -116,7 +116,7 @@ class BPM3pProcess(ArrivalProcess):
 
     @property
     def bounds(self):
-        return [0, 0, 0], [+np.inf, +np.inf, +np.inf]
+        return [1e-3, 1e-3, 1e-3], [+np.inf, +np.inf, +np.inf]
 
 
 PROCESS_TYPES = {

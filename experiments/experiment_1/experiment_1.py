@@ -28,7 +28,10 @@ class Experiment1(Experiment):
             target = self.rng.choice(list(current_receiver_set))
             receivers.remove(target)
             self.program_launcher.launch(h, script_path=script,
-                                         dst_ip=target.IP(), port='100', rate=rates[i])
+                                         dst_ip=target.IP(),
+                                         port='100',
+                                         rate=rates[i],
+                                         seed=self.config.seed)
 
     @property
     def controller_cls(self):

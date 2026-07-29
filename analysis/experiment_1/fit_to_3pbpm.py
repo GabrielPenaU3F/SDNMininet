@@ -20,8 +20,8 @@ if __name__ == '__main__':
     seed = int(argv[2])
 
     df = pd.read_csv(csv_path)
-    x = df['timestamp'].to_numpy()
-    y = df['packets'].to_numpy()
+    x = df['timestamp'].to_numpy()[1:]
+    y = df['packets'].to_numpy()[1:]
 
     beta, gamma, rho = fit_parameters(x, y, seed)
 
