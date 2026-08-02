@@ -68,7 +68,7 @@ class ExperimentLauncher:
         parser.add_argument(
             '--seed',
             type=int,
-            default=None,
+            default=0,
             help='Random seed for reproducible experiments'
         )
 

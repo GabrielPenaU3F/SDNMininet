@@ -1,5 +1,4 @@
 import socket
-import sys
 
 
 class UDPReceiver:
@@ -10,19 +9,12 @@ class UDPReceiver:
             socket.SOCK_DGRAM
         )
 
-        # Le dice al kernel:
-        # "Quiero recibir todos los paquetes UDP
-        # destinados a este puerto."
-        self.socket.bind(("0.0.0.0", port))
+        self.socket.bind(('0.0.0.0', port))
 
     def run(self):
         while True:
             data, sender = self.socket.recvfrom(4096)
-            print(f"Recibido desde {sender}: {data.decode('utf-8')}")
+            self._print_on_reception(sender, data)
 
-
-if __name__ == "__main__":
-
-    port = int(sys.argv[1])
-    rcv = UDPReceiver(port)
-    rcv.run()
+    def _print_on_reception(self, sender, data):
+        print(f"Received from {sender}: {data.decode('utf-8')}")

@@ -23,7 +23,8 @@ class ExperimentConfig:
 
         # Root directory initialization
         self.experiment_root = self._calculate_experiment_root(experiment_root, experiment_name)
-        self._initialize_experiment_root_directory()
+        self._initialize_measurements_directory()
+        self._initialize_host_stdout_directory()
 
 
     @classmethod
@@ -43,8 +44,14 @@ class ExperimentConfig:
 
         return Path(experiment_root) / experiment_name
 
-    def _initialize_experiment_root_directory(self):
+    def _initialize_measurements_directory(self):
         self.measurements_path.mkdir(
+            parents=True,
+            exist_ok=True
+        )
+
+    def _initialize_host_stdout_directory(self):
+        self.stdout_path.mkdir(
             parents=True,
             exist_ok=True
         )
@@ -82,3 +89,7 @@ class ExperimentConfig:
     @property
     def measurements_path(self):
         return self.experiment_root / 'measurements'
+
+    @property
+    def stdout_path(self):
+        return self.experiment_root / 'host_stdout'

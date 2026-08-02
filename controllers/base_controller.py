@@ -1,6 +1,5 @@
 import csv
 import json
-import os
 import socket
 import time
 from pathlib import Path
@@ -33,11 +32,8 @@ class BaseController(app_manager.RyuApp):
         self.switches = {}
         self.current_poll_id = 0
         self.switch_poll = {}
-        self._traffic_stats_csv = self._open_traffic_stats_file()
-        self.csv_writer = csv.writer(self._traffic_stats_csv)
-
         self._load_config()
-        self._setup_csv_header()
+        self.t0 = time.monotonic()
 
     @staticmethod
     def _open_traffic_stats_file():
@@ -54,7 +50,7 @@ class BaseController(app_manager.RyuApp):
         self.logger.info('Ryu: startup complete')
 
     def _set_up_monitor(self):
-        self.monitor_thread = hub.spawn(self._monitor)  # Thread con tareas de monitoreo
+        self.monitor_thread = hub.spawn(self._monitor)
         self.logger.info('Monitor online - receiving stats')
 
     # Event Handlers
@@ -109,32 +105,6 @@ class BaseController(app_manager.RyuApp):
 
         self.forward_packet(datapath, msg, out_port)
 
-
-    @set_ev_cls(
-        ofp_event.EventOFPPortStatsReply,
-        MAIN_DISPATCHER
-    )
-    def port_stats_reply_handler(self, ev):
-        body = ev.msg.body
-        switch_id = ev.msg.datapath.id
-        for stat in body:
-            if stat.port_no > 0xffffff00:
-                continue
-
-            poll_id = self.switch_poll[switch_id]
-            self.csv_writer.writerow([
-                poll_id,
-                time.time(),
-                switch_id,
-                stat.port_no,
-                stat.rx_packets,
-                # stat.tx_packets,
-                stat.rx_bytes,
-                # stat.tx_bytes
-            ])
-
-        self._traffic_stats_csv.flush()
-
     # Methods
 
     @staticmethod
@@ -171,18 +141,6 @@ class BaseController(app_manager.RyuApp):
                 self.request_port_stats(datapath)
 
             hub.sleep(self.sampling_interval)
-
-    def _setup_csv_header(self):
-        self.csv_writer.writerow([
-            'poll_id',
-            'timestamp',
-            'switch_id',
-            'port_no',
-            'rx_packets',
-            # "tx_packets",
-            'rx_bytes',
-            # "tx_bytes"
-        ])
 
     def _signal_startup_complete(self):
         server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)

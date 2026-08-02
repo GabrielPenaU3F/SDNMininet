@@ -1,7 +1,7 @@
 import socket
 import time
 
-from model.traffic_models import ArrivalProcess
+from model.traffic_models.arrival_processes import ArrivalProcess
 
 
 class UDPSender:
@@ -17,11 +17,15 @@ class UDPSender:
         self.destination = (dst_ip, dst_port)
 
     def run(self):
+        seq = 0
         while True:
             dt = self.process.interarrival_time()
             time.sleep(dt)
+            self._on_send(seq)
+            seq += 1
 
-            self.socket.sendto(
-                b"Lorem ipsum",
-                self.destination
-            )
+    def _on_send(self, seq):
+        self.socket.sendto(
+            b"Lorem ipsum",
+            self.destination
+        )

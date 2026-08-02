@@ -8,7 +8,7 @@ from launchers.host_program_launcher import HostProgramLauncher
 class TestHostProgramLauncher:
 
     def test_build_command_args(self):
-        launcher = HostProgramLauncher(context=Mock())
+        launcher = HostProgramLauncher(experiment_config=Mock())
 
         args = launcher._build_command_args(
             rate=100,

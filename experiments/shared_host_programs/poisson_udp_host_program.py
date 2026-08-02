@@ -4,6 +4,8 @@ from model.host import Host
 from model.traffic_models.arrival_processes import PoissonProcess
 from model.udp_receiver import UDPReceiver
 from model.udp_sender import UDPSender
+from model.verbose_udp_receiver import VerboseUDPReceiver
+from model.verbose_udp_sender import VerboseUDPSender
 
 if __name__ == '__main__':
 
@@ -19,12 +21,11 @@ if __name__ == '__main__':
     process = PoissonProcess(args.rate, seed=args.seed)
 
     # Create UDP sender and receiver
-    sender = UDPSender(
+    sender = VerboseUDPSender(
         process,
         args.dst_ip,
         args.port
     )
     receiver = UDPReceiver(args.port)
-
     host = Host(sender, receiver)
     host.run()
