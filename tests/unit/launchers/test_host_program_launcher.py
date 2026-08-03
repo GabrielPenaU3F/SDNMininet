@@ -25,6 +25,11 @@ class TestHostProgramLauncher:
     def test_launch_invokes_popen_with_expected_command(self, monkeypatch, tmp_path):
         context = Mock()
         context.experiment_root = tmp_path / 'experiments'
+        context.stdout_path = tmp_path / 'stdout'
+
+        context.experiment_root.mkdir()
+        context.stdout_path.mkdir()
+
         launcher = HostProgramLauncher(context)
 
         environment = Mock()
@@ -42,6 +47,8 @@ class TestHostProgramLauncher:
         )
 
         mn_process_launcher = Mock()
+        mn_process_launcher.name = 'h1'
+
         process = object()
         mn_process_launcher.popen.return_value = process
 
@@ -52,15 +59,21 @@ class TestHostProgramLauncher:
             duration=60
         )
 
-        mn_process_launcher.popen.assert_called_once_with(
+        args, kwargs = mn_process_launcher.popen.call_args
+
+        assert args == (
             [
                 '/.venv/bin/python',
                 Path('/project/host_program.py'),
                 '--rate', '100',
                 '--duration', '60'
             ],
-            env={'PYTHONPATH': '/project'},
-            cwd=tmp_path / 'experiments'
         )
+
+        assert kwargs['env'] == {'PYTHONPATH': '/project'}
+        assert kwargs['cwd'] == context.experiment_root
+
+        assert kwargs['stdout'].name == str(context.stdout_path / 'h1.out')
+        assert kwargs['stderr'].name == str(context.stdout_path / 'h1.err')
 
         assert result is process

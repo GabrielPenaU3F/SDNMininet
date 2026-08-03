@@ -1,4 +1,3 @@
-import csv
 import json
 import socket
 import time
@@ -34,14 +33,6 @@ class BaseController(app_manager.RyuApp):
         self.switch_poll = {}
         self._load_config()
         self.t0 = time.monotonic()
-
-    @staticmethod
-    def _open_traffic_stats_file():
-        return open(
-            'measurements/traffic_stats.csv',
-            'w',
-            newline=''
-        )
 
     def start(self):
         super().start()
@@ -83,13 +74,6 @@ class BaseController(app_manager.RyuApp):
         pkt = Packet(ev.msg.data)
         eth = pkt.get_protocol(ethernet.ethernet)
         in_port = ev.msg.match['in_port']
-
-        self.logger.info(
-            f'In port = {in_port}, '
-            f'Source MAC = {eth.src}, '
-            f'Destination MAC = {eth.dst}, '
-            f'Ethernet type = {hex(eth.ethertype)}'
-        )
         msg = ev.msg
         datapath = msg.datapath
 

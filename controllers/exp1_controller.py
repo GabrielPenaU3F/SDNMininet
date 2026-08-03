@@ -17,6 +17,14 @@ class Experiment1Controller(BaseController):
         self.csv_writer = csv.writer(self._traffic_stats_csv)
         self._setup_csv_header()
 
+    @staticmethod
+    def _open_traffic_stats_file():
+        return open(
+            'measurements/traffic_stats.csv',
+            'w',
+            newline=''
+        )
+
     def _setup_csv_header(self):
         self.csv_writer.writerow([
             'poll_id',
