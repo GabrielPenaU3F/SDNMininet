@@ -12,16 +12,17 @@ class DebugController(BaseController):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._test_measurement = self._open_measurement_file()
+        self._test_file = self._open_measurement_file()
         self.last_rx = {}
         self.last_tx = {}
+        self.write_config()
 
     @staticmethod
     def _open_measurement_file():
-        with open('measurements/test_file', 'w', newline='') as f:
-            f.write('Debugging...')
-            return f
-        # TODO: close (and close in exp1_controller too)
+        f = open('measurements/test_file', 'w', newline='')
+        f.write('Debugging...\n')
+        f.flush()
+        return f
 
 
     @set_ev_cls(
@@ -64,3 +65,7 @@ class DebugController(BaseController):
             f'Ethernet type = {hex(eth.ethertype)}'
         )
         super().packet_in_handler(ev)
+
+    def write_config(self):
+        self._test_file.write(f'SI={str(self.sampling_interval)}\n')
+        self._test_file.flush()

@@ -1,6 +1,7 @@
 import json
 import socket
 import time
+from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Any
 
@@ -18,7 +19,7 @@ from controllers.rules.setup_rules import install_send_everything_to_controller_
 from config.environment import Environment
 
 
-class BaseController(app_manager.RyuApp):
+class BaseController(app_manager.RyuApp, ABC):
 
     OFP_VERSIONS = [
         ofproto_v1_3.OFP_VERSION
@@ -64,7 +65,6 @@ class BaseController(app_manager.RyuApp):
         # Install necessary rules
         install_send_everything_to_controller_rule(datapath)
         install_discard_ipv6_traffic_rule(datapath)
-
 
     @set_ev_cls(
         ofp_event.EventOFPPacketIn,

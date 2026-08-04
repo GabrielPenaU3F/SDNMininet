@@ -1,7 +1,6 @@
 from pathlib import Path
 from unittest.mock import Mock
 
-from config.environment import Environment
 from launchers.host_program_launcher import HostProgramLauncher
 
 

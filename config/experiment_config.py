@@ -92,4 +92,4 @@ class ExperimentConfig:
 
     @property
     def stdout_path(self):
-        return self.experiment_root / 'host_stdout'
+        return self.experiment_root / 'stdout'

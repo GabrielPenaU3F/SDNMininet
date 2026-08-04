@@ -29,12 +29,23 @@ class ControllerManager:
         env = Environment.get_environment()
         ryu_manager = env.ryu_manager_path
         controller_path = self._resolve_controller_path()
-        return subprocess.Popen(
+        stdout = open(config.stdout_path / 'controller.out', 'w')
+        stderr = open(config.stdout_path / 'controller.err', 'w')
+
+        proc = subprocess.Popen(
             [
                 ryu_manager,
                 controller_path
-            ], env=env.get_env_dict(), cwd=config.experiment_root
+            ], env=env.get_env_dict(),
+            cwd=config.experiment_root,
+            stdout=stdout,
+            stderr=stderr
         )
+
+        stdout.close()
+        stderr.close()
+
+        return proc
 
     def _wait_until_ready(self):
         deadline = time.monotonic() + self._timeout

@@ -9,13 +9,19 @@ class HostProgramLauncher:
 
     def launch(self, mn_process_launcher, script_path: str, **kwargs):
         command = self._build_command(script_path, **kwargs)
+        stdout = open(self.experiment_config.stdout_path / f'{mn_process_launcher.name}.out', 'w')
+        stderr = open(self.experiment_config.stdout_path / f'{mn_process_launcher.name}.err', 'w')
+
         proc = mn_process_launcher.popen(
             command,
             env=Environment.get_env_dict(),
             cwd=self.experiment_config.experiment_root,
-            stdout=open(self.experiment_config.stdout_path / f'{mn_process_launcher.name}.out', 'w'),
-            stderr=open(self.experiment_config.stdout_path / f'{mn_process_launcher.name}.err', 'w')
+            stdout=stdout,
+            stderr=stderr
         )
+
+        stdout.close()
+        stderr.close()
         return proc
 
     def _build_command(self, script_path: str, **kwargs) -> List[str]:
