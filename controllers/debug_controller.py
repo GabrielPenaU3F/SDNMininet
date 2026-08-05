@@ -47,7 +47,7 @@ class DebugController(BaseController):
             if port not in self.last_tx.keys():
                 self.last_tx[port] = tx_packets
 
-            print(f'Poll ID: {poll_id} -- Time: {time.monotonic() - self.t0:.6f} -- Port: {port}'
+            self.logger.info(f'Poll ID: {poll_id} -- Time: {time.monotonic() - self.t0:.6f} -- Port: {port}'
                   f' -- RX Packets: {rx_packets - self.last_rx.get(port)}'
                   f' -- TX Packets: {tx_packets - self.last_tx.get(port)}')
             self.last_rx[port] = rx_packets

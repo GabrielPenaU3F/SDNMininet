@@ -7,12 +7,12 @@ class HostProgramLauncher:
     def __init__(self, experiment_config):
         self.experiment_config = experiment_config
 
-    def launch(self, mn_process_launcher, script_path: str, **kwargs):
+    def launch(self, mn_host, script_path: str, **kwargs):
         command = self._build_command(script_path, **kwargs)
-        stdout = open(self.experiment_config.stdout_path / f'{mn_process_launcher.name}.out', 'w')
-        stderr = open(self.experiment_config.stdout_path / f'{mn_process_launcher.name}.err', 'w')
+        stdout = open(self.experiment_config.stdout_path / f'{mn_host.name}.out', 'w')
+        stderr = open(self.experiment_config.stdout_path / f'{mn_host.name}.err', 'w')
 
-        proc = mn_process_launcher.popen(
+        proc = mn_host.popen(
             command,
             env=Environment.get_env_dict(),
             cwd=self.experiment_config.experiment_root,

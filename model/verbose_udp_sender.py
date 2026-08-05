@@ -1,3 +1,4 @@
+import subprocess
 import time
 
 from model.traffic_models.arrival_processes import ArrivalProcess
@@ -11,11 +12,19 @@ class VerboseUDPSender(UDPSender):
         self.t0 = time.monotonic()
 
     def _on_send(self, seq):
+
         payload = f'{seq},{time.monotonic() - self.t0}'
         with open('measurements/sender.log', 'a') as f:
             f.write(f'{payload}\n')
 
-        self.socket.sendto(
-            payload.encode('utf-8'),
-            self.destination
-        )
+        try:
+            self.socket.sendto(
+                payload.encode('utf-8'),
+                self.destination
+            )
+        except OSError as e:
+            with open("EXCEPT", "a") as f:
+                f.write(f"{e}\n")
+                f.write(f"DEST?={self.destination}\n")
+                f.write(f"NAME={self.socket.getsockname()}\n")
+            raise
