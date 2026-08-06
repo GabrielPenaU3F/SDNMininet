@@ -1,6 +1,6 @@
 import argparse
 
-from model.host import Host
+from model.host_application import HostApplication
 from model.silent_sender import SilentSender
 from model.udp_receiver import UDPReceiver
 from model.verbose_udp_receiver import VerboseUDPReceiver
@@ -17,5 +17,5 @@ if __name__ == '__main__':
     # receiver = UDPReceiver(args.port)
     receiver = VerboseUDPReceiver(args.port)
 
-    host = Host(sender, receiver)
-    host.run()
+    host_app = HostApplication(sender, receiver)
+    host_app.run()

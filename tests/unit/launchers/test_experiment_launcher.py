@@ -63,32 +63,32 @@ class TestLoadExperiment:
 
         execvp = Mock()
 
-        monkeypatch.setattr("os.execvp", execvp)
+        monkeypatch.setattr('os.execvp', execvp)
         launcher._ensure_root()
 
         execvp.assert_not_called()
 
     def test_ensure_root_relaunches_with_sudo(self, launcher, monkeypatch, valid_argv):
-        monkeypatch.setattr("os.geteuid", lambda: 1000)
+        monkeypatch.setattr('os.geteuid', lambda: 1000)
 
         monkeypatch.setattr(
-            "sys.executable",
-            "/home/user/.venv/bin/python"
+            'sys.executable',
+            '/home/user/.venv/bin/python'
         )
 
         execvp = Mock()
-        monkeypatch.setattr("os.execvp", execvp)
+        monkeypatch.setattr('os.execvp', execvp)
 
         launcher._ensure_root()
 
         expected = [
-            "sudo",
-            "/home/user/.venv/bin/python",
-            "run.py",
-            "dummy_experiment"
+            'sudo',
+            '/home/user/.venv/bin/python',
+            'run.py',
+            'dummy_experiment'
         ]
 
         execvp.assert_called_once_with(
-            "sudo",
+            'sudo',
             expected
         )

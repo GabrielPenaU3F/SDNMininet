@@ -1,6 +1,6 @@
 import argparse
 
-from model.host import Host
+from model.host_application import HostApplication
 from model.traffic_models.arrival_processes import PoissonProcess
 from model.udp_receiver import UDPReceiver
 from model.udp_sender import UDPSender
@@ -27,5 +27,5 @@ if __name__ == '__main__':
         args.port
     )
     receiver = UDPReceiver(args.port)
-    host = Host(sender, receiver)
-    host.run()
+    host_app = HostApplication(sender, receiver)
+    host_app.run()

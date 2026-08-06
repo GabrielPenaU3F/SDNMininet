@@ -6,6 +6,7 @@ class HostProgramLauncher:
 
     def __init__(self, experiment_config):
         self.experiment_config = experiment_config
+        self.processes = []
 
     def launch(self, mn_host, script_path: str, **kwargs):
         command = self._build_command(script_path, **kwargs)

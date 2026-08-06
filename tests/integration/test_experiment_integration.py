@@ -1,8 +1,10 @@
 import time
 from pathlib import Path
 
+from config.experiment_config import ExperimentConfig
 from controllers.debug_controller import DebugController
 from experiments.experiment import Experiment
+from experiments.experiment_debug.experiment_debug import ExperimentDebug
 from topologies.simple_topology import SimpleTopology
 
 
@@ -63,3 +65,41 @@ class TestExperimentIntegration:
             _ = f.readline()
             line_2 = f.readline()
         assert line_2.rstrip() == 'SI=0.05'
+
+    def test_experiment_hosts_redirect_console_outputs(self, make_experiment, tmp_path):
+        experiment = make_experiment(
+            ExperimentDebug,
+            sampling_interval=0.05,
+            duration=0.1,
+        )
+
+        experiment.execute()
+        stdout_dir = experiment.config.stdout_path
+
+        for host in ('h1', 'h2'):
+            stderr = stdout_dir / f'{host}.err'
+            stdout = stdout_dir / f'{host}.out'
+            assert stderr.exists()
+            assert stdout.exists()
+
+    # def test_experiment_shuts_down_cleanly(self, make_experiment, tmp_path):
+    #     experiment = make_experiment(
+    #         ExperimentDebug,
+    #         sampling_interval=0.05,
+    #         duration=1,
+    #     )
+    #
+    #     experiment.execute()
+    #     stdout_dir = experiment.config.stdout_path
+    #
+    #     for host in ('h1', 'h2'):
+    #         stderr = stdout_dir / f'{host}.err'
+    #
+    #         content = stderr.read_text()
+    #         assert 'Traceback' not in content, \
+    #             f'{host} crashed:\n{content}'
+    #
+    #         assert 'Network is unreachable' not in content, \
+    #             f'{host} attempted to use the network after shutdown:\n{content}'
+    #
+    #         assert content == ''
