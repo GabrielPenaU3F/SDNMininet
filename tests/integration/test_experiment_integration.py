@@ -60,5 +60,6 @@ class TestExperimentIntegration:
 
         file = tmp_path / 'dummy_experiment' / 'measurements' / 'test_file'
         with open(str(file), 'r') as f:
-            line = f.readline()
-        assert line.rstrip() == 'SI=0.05'
+            _ = f.readline()
+            line_2 = f.readline()
+        assert line_2.rstrip() == 'SI=0.05'

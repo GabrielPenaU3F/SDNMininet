@@ -8,6 +8,7 @@ dst = ("10.0.0.2", 100)
 print("Sender started")
 
 i = 0
+t0 = time.monotonic()
 while True:
     msg = f"packet {i}"
     print(f"Sending: {msg}")
