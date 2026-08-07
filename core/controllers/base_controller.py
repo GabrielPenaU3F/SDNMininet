@@ -1,4 +1,5 @@
 import json
+import os
 import socket
 import time
 from abc import ABC
@@ -154,11 +155,10 @@ class BaseController(app_manager.RyuApp, ABC):
             socket_path.unlink()
 
     def _load_config(self):
-        experiment_name = Path.cwd().name
-        config_file = Environment.get_environment().temp_path / f'{experiment_name}_cfg.json'
+        config_file = Path(os.environ['EXPERIMENT_CFG'])
         with config_file.open() as f:
             cfg = json.load(f)
 
         self.sampling_interval = cfg['sampling_interval']
         self.seed = cfg['seed']
-        self.experiment_root = Path(cfg["experiment_root"])
+        self.experiment_root = Path(cfg['experiment_root'])

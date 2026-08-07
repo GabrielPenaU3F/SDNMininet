@@ -35,13 +35,14 @@ class ControllerManager:
         stdout = open(config.stdout_path / 'controller.out', 'w')
         stderr = open(config.stdout_path / 'controller.err', 'w')
 
-        env = Environment.get_environment()
-
+        env_dict = Environment.get_env_dict().copy()
+        env_dict['EXPERIMENT_CFG'] = str(self.config.experiment_root / 'cfg.json')
         proc = subprocess.Popen(
             [
                 ryu_manager,
                 controller_path
-            ], env=env.get_env_dict(),
+            ],
+            env=env_dict,
             cwd=config.experiment_root,
             stdout=stdout,
             stderr=stderr

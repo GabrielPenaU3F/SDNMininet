@@ -82,10 +82,7 @@ class ExperimentConfig:
 
     @property
     def config_file(self):
-        return (
-            Environment.get_environment().temp_path
-            / f'{self.experiment_name}_cfg.json'
-        )
+        return self.experiment_root / 'cfg.json'
 
     @property
     def measurements_path(self):
