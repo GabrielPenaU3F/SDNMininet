@@ -1,4 +1,4 @@
-from controllers.base_controller import BaseController
+from core.controllers.base_controller import BaseController
 
 
 class DummyController(BaseController):

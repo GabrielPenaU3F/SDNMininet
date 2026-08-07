@@ -1,7 +1,7 @@
 import numpy as np
 
 from config.environment import Environment
-from controllers.exp1_controller import Experiment1Controller
+from experiments.experiment_1.exp1_controller import Experiment1Controller
 from experiments.experiment import Experiment
 from topologies.awad_topology import AwadDDoSTopology
 

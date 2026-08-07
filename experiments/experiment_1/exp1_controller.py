@@ -4,7 +4,7 @@ import time
 from ryu.controller import ofp_event
 from ryu.controller.handler import set_ev_cls, MAIN_DISPATCHER
 
-from controllers.base_controller import BaseController
+from core.controllers.base_controller import BaseController
 
 
 class Experiment1Controller(BaseController):

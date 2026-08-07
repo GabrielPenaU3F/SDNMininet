@@ -1,5 +1,5 @@
 from config.environment import Environment
-from controllers.base_controller import BaseController
+from core.controllers.base_controller import BaseController
 from experiments.experiment import Experiment
 from topologies.awad_topology import AwadDDoSTopology
 

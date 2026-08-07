@@ -23,14 +23,9 @@ class TestEnvironmentBasics:
 
         expected_project_root = Path(__file__).resolve().parents[2]
         assert env.temp_path == expected_project_root / 'temp'
-        assert env.controllers_path == expected_project_root / 'controllers'
 
 
 class TestEnvironmentFilesystem:
-
-    def test_environment_creates_controllers_directory(self, fake_env):
-        assert fake_env.controllers_path.exists()
-        assert fake_env.controllers_path.is_dir()
 
     def test_environment_creates_topologies_directory(self, fake_env):
         assert fake_env.topologies_path.exists()

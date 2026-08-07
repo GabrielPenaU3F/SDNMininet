@@ -5,7 +5,7 @@ from ryu.controller.handler import set_ev_cls, MAIN_DISPATCHER
 from ryu.lib.packet import ethernet
 from ryu.lib.packet.packet import Packet
 
-from controllers.base_controller import BaseController
+from core.controllers.base_controller import BaseController
 
 
 class DebugController(BaseController):
