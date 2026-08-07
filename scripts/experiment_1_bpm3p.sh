@@ -8,6 +8,6 @@
  experiments/experiment_1/measurements/grouped_packets.csv \
  1 1.0
 
-.venv/bin/python -m analysis.experiment_1.fit_to_3pbpm \
+.venv/bin/python -m experiments.experiment_1.analysis.fit_to_3pbpm \
  experiments/experiment_1/measurements/grouped_packets.csv \
  1
