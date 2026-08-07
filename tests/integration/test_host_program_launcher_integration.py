@@ -1,8 +1,8 @@
 from pathlib import Path
 
 from core.controllers.base_controller import BaseController
+from core.launchers.host_program_launcher import HostProgramLauncher
 from experiments.experiment import Experiment
-from launchers.host_program_launcher import HostProgramLauncher
 from topologies.simple_topology import SimpleTopology
 
 

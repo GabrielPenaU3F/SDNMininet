@@ -1,6 +1,6 @@
 import pytest
 
-from infrastructure.network_manager import NetworkManager
+from core.network_manager import NetworkManager
 from topologies.simple_topology import SimpleTopology
 
 @pytest.fixture

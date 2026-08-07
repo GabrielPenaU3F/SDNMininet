@@ -4,10 +4,10 @@ from abc import ABC, abstractmethod
 import mininet.clean as mn_clean
 import numpy as np
 
-from infrastructure.controller_manager import ControllerManager
+from core.controller_manager import ControllerManager
+from core.launchers.host_program_launcher import HostProgramLauncher
 
-from infrastructure.network_manager import NetworkManager
-from launchers.host_program_launcher import HostProgramLauncher
+from core.network_manager import NetworkManager
 
 
 class Experiment(ABC):

@@ -4,8 +4,8 @@ Do not install with root. Just run the following:
 ```bash
 git clone https://github.com/GabrielPenaU3F/SDNMininet
 cd SDNMininet
-chmod +x scripts/install.sh
-./scripts/install.sh
+chmod +x install.sh
+./install.sh
 ```
 
 # HOW TO RUN

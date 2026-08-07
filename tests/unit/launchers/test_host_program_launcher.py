@@ -3,30 +3,31 @@ import pytest
 from pathlib import Path
 from unittest.mock import Mock
 
-from launchers.host_program_launcher import HostProgramLauncher
+from core.launchers.host_program_launcher import HostProgramLauncher
+
 
 @pytest.fixture
 def example_program_launcher(tmp_path, monkeypatch):
-    context = Mock()
-    context.experiment_root = tmp_path / 'experiments'
-    context.stdout_path = tmp_path / 'stdout'
+    config = Mock()
+    config.experiment_root = tmp_path / 'experiments'
+    config.stdout_path = tmp_path / 'stdout'
 
-    context.experiment_root.mkdir()
-    context.stdout_path.mkdir()
+    config.experiment_root.mkdir()
+    config.stdout_path.mkdir()
 
-    launcher = HostProgramLauncher(context)
+    launcher = HostProgramLauncher(config)
 
     environment = Mock()
     environment.python_path = '/.venv/bin/python'
     environment.project_root = Path('/project')
 
     monkeypatch.setattr(
-        'launchers.host_program_launcher.Environment.get_environment',
+        'core.launchers.host_program_launcher.Environment.get_environment',
         Mock(return_value=environment)
     )
 
     monkeypatch.setattr(
-        'launchers.host_program_launcher.Environment.get_env_dict',
+        'core.launchers.host_program_launcher.Environment.get_env_dict',
         Mock(return_value={'PYTHONPATH': '/project'})
     )
 

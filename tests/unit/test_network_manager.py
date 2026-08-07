@@ -1,9 +1,9 @@
 from unittest.mock import Mock
 
 import pytest
-import infrastructure.network_manager as network_module
+import core.network_manager as network_module
 
-from infrastructure.network_manager import NetworkManager
+from core.network_manager import NetworkManager
 from tests.dummies.dummy_topology import DummyTopology
 
 

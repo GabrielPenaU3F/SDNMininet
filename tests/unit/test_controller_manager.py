@@ -2,7 +2,7 @@ import pytest
 
 from unittest.mock import Mock, MagicMock
 
-from infrastructure.controller_manager import ControllerManager
+from core.controller_manager import ControllerManager
 from tests.dummies.dummy_controller import DummyController
 
 
