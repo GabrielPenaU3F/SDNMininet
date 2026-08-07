@@ -1,5 +1,5 @@
 from core.config.environment import Environment
-from experiments.experiment_debug.debug_controller import DebugController
+from core.controllers.debug_controller import DebugController
 from experiments.experiment import Experiment
 from topologies.simple_topology import SimpleTopology
 

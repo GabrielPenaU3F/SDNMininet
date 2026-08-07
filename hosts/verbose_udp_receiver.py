@@ -1,6 +1,6 @@
 import time
 
-from model.udp_receiver import UDPReceiver
+from hosts.udp_receiver import UDPReceiver
 
 
 class VerboseUDPReceiver(UDPReceiver):

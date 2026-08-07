@@ -1,11 +1,9 @@
 import argparse
 
-from model.host_application import HostApplication
-from model.traffic_models.arrival_processes import PoissonProcess
-from model.udp_receiver import UDPReceiver
-from model.udp_sender import UDPSender
-from model.verbose_udp_receiver import VerboseUDPReceiver
-from model.verbose_udp_sender import VerboseUDPSender
+from hosts.host_application import HostApplication
+from traffic_models.arrival_processes import PoissonProcess
+from hosts.udp_receiver import UDPReceiver
+from hosts.verbose_udp_sender import VerboseUDPSender
 
 if __name__ == '__main__':
 

@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from model.traffic_models.arrival_processes import PoissonProcess, ArrivalProcess, BPM3pProcess
+from traffic_models.arrival_processes import PoissonProcess, ArrivalProcess, BPM3pProcess
 
 
 class TestBaseClass:

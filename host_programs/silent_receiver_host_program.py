@@ -1,9 +1,9 @@
 import argparse
 
-from model.host_application import HostApplication
-from model.silent_sender import SilentSender
-from model.udp_receiver import UDPReceiver
-from model.verbose_udp_receiver import VerboseUDPReceiver
+from hosts.host_application import HostApplication
+from hosts.silent_sender import SilentSender
+from hosts.udp_receiver import UDPReceiver
+from hosts.verbose_udp_receiver import VerboseUDPReceiver
 
 if __name__ == '__main__':
 

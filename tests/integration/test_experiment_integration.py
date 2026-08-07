@@ -1,7 +1,7 @@
 import time
 from pathlib import Path
 
-from experiments.experiment_debug.debug_controller import DebugController
+from core.controllers.debug_controller import DebugController
 from experiments.experiment import Experiment
 from experiments.experiment_debug.experiment_debug import ExperimentDebug
 from topologies.simple_topology import SimpleTopology

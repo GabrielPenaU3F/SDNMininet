@@ -1,5 +1,5 @@
-from experiments.experiment_register import EXPERIMENTS
-from core.launchers import ExperimentLauncher
+from core.launchers.experiment_launcher import ExperimentLauncher
+from experiments.registry import EXPERIMENTS
 
 
 def main():

@@ -27,10 +27,6 @@ class TestEnvironmentBasics:
 
 class TestEnvironmentFilesystem:
 
-    def test_environment_creates_topologies_directory(self, fake_env):
-        assert fake_env.topologies_path.exists()
-        assert fake_env.topologies_path.is_dir()
-
     def test_environment_creates_experiments_directory(self, fake_env):
         assert fake_env.experiments_path.exists()
         assert fake_env.experiments_path.is_dir()

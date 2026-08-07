@@ -23,10 +23,6 @@ class Environment:
     # Properties
 
     @property
-    def topologies_path(self) -> Path:
-        return self.project_root / 'topologies'
-
-    @property
     def experiments_path(self) -> Path:
         return self.project_root / 'experiments'
 
@@ -53,7 +49,6 @@ class Environment:
     @property
     def _required_directories(self):
         return (
-            self.topologies_path,
             self.experiments_path,
             self.host_programs_path,
             self.temp_path,

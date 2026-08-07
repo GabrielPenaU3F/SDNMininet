@@ -1,7 +1,7 @@
 import time
 
-from model.traffic_models.arrival_processes import ArrivalProcess
-from model.udp_sender import UDPSender
+from traffic_models.arrival_processes import ArrivalProcess
+from hosts.udp_sender import UDPSender
 
 
 class VerboseUDPSender(UDPSender):

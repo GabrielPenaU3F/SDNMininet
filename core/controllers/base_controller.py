@@ -161,3 +161,4 @@ class BaseController(app_manager.RyuApp, ABC):
 
         self.sampling_interval = cfg['sampling_interval']
         self.seed = cfg['seed']
+        self.experiment_root = Path(cfg["experiment_root"])

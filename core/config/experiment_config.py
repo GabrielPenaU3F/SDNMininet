@@ -68,6 +68,7 @@ class ExperimentConfig:
         with self.config_file.open('w') as f:
             json.dump(
                 {
+                    'experiment_root': str(self.experiment_root),
                     'sampling_interval': self.sampling_interval,
                     'seed': self.seed,
                 }, f, indent=4,

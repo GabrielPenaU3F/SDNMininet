@@ -6,7 +6,7 @@ import matplotlib
 matplotlib.use('QtAgg')
 from matplotlib import pyplot as plt
 
-from model.traffic_models.arrival_processes import BPM3pProcess
+from traffic_models.arrival_processes import BPM3pProcess
 
 
 def fit_parameters(x, y, seed=42):
