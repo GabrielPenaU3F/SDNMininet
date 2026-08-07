@@ -4,19 +4,22 @@ import pytest
 import core.network_manager as network_module
 
 from core.network_manager import NetworkManager
+from hosts.host import Host
 from tests.dummies.dummy_topology import DummyTopology
+from mininet.node import Host as MininetHost
 
 
 @pytest.fixture
-def network_manager():
-    return NetworkManager(DummyTopology)
+def network_manager(monkeypatch):
+    manager = NetworkManager(DummyTopology)
+    return manager
 
 @pytest.fixture()
 def make_mininet_patch(monkeypatch):
     def _make(return_value):
         monkeypatch.setattr(
             network_module,
-            "Mininet",
+            'Mininet',
             Mock(return_value=return_value)
         )
     return _make
@@ -37,7 +40,7 @@ class TestBuildNetwork:
 
         monkeypatch.setattr(
             network_manager,
-            "topology_cls",
+            'topology_cls',
             Mock(return_value=topo)
         )
 
@@ -55,9 +58,9 @@ class TestBuildNetwork:
         net = network_manager.build_network()
 
         net.addController.assert_called_once_with(
-            "c0",
+            'c0',
             controller=network_module.RemoteController,
-            ip="127.0.0.1",
+            ip='127.0.0.1',
             port=6633
         )
 
@@ -66,16 +69,41 @@ class TestBuildNetwork:
         make_mininet_patch(mock_net)
 
         net = network_manager.build_network(
-            controller_ip="10.0.0.5",
+            controller_ip='10.0.0.5',
             controller_port=9999
         )
 
         net.addController.assert_called_once_with(
-            "c0",
+            'c0',
             controller=network_module.RemoteController,
-            ip="10.0.0.5",
+            ip='10.0.0.5',
             port=9999
         )
+
+
+class TestManagerWrapsHosts:
+
+    def test_manager_wraps_each_host_in_the_network(self, network_manager, make_mininet_patch):
+        net_mock = Mock()
+
+        mn_h1 = Mock(spec=MininetHost)
+        mn_h1.name = 'h1'
+
+        mn_h2 = Mock(spec=MininetHost)
+        mn_h2.name = 'h2'
+
+        net_mock.nameToNode = {
+            'h1': mn_h1,
+            'h2': mn_h2,
+        }
+
+        make_mininet_patch(net_mock)
+        network_manager.build_network()
+
+        assert isinstance(network_manager.host('h1'), Host)
+        assert isinstance(network_manager.host('h2'), Host)
+        assert network_manager.host('h1').mn_host is mn_h1
+        assert network_manager.host('h2').mn_host is mn_h2
 
 
 class TestStart:

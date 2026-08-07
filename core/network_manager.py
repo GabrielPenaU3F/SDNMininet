@@ -1,5 +1,8 @@
 from mininet.net import Mininet
 from mininet.node import RemoteController
+from mininet.node import Host as MininetHost, Switch as MininetSwitch
+
+from hosts.host import Host
 
 
 class NetworkManager:
@@ -7,8 +10,9 @@ class NetworkManager:
     def __init__(self, topology_cls, **kwargs):
         self.topology_cls = topology_cls
         self.net = None
+        self._hosts = {}
 
-    def build_network(self, controller_ip="127.0.0.1", controller_port=6633):
+    def build_network(self, controller_ip='127.0.0.1', controller_port=6633):
         topo = self.topology_cls()
         net = Mininet(
             topo=topo,
@@ -17,13 +21,14 @@ class NetworkManager:
         )
 
         net.addController(
-            "c0",
+            'c0',
             controller=RemoteController,
             ip=controller_ip,
             port=controller_port
         )
 
         self.net = net
+        self._wrap_hosts()
         return net
 
     def start(self):
@@ -32,3 +37,20 @@ class NetworkManager:
     def stop(self):
         if self.net is not None:
             self.net.stop()
+
+    # This does NOT support switches
+    def _wrap_hosts(self):
+        self._hosts = {
+            name: Host(mn_host)
+            for name, mn_host in self.net.nameToNode.items()
+            if isinstance(mn_host, MininetHost)
+        }
+
+    def host(self, hostname):
+        return self._hosts[hostname]
+
+    def switch(self, swname):
+        switch = self.net[swname]
+        if isinstance(switch, MininetSwitch):
+            return switch
+        return None
