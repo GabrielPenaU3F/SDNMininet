@@ -2,8 +2,8 @@ import socket
 import subprocess
 import time
 
-from config.environment import Environment
-from config.experiment_config import ExperimentConfig
+from core.config.environment import Environment
+from core.config.experiment_config import ExperimentConfig
 
 
 class ControllerManager:

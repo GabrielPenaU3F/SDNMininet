@@ -1,6 +1,6 @@
 import numpy as np
 
-from config.environment import Environment
+from core.config.environment import Environment
 from experiments.experiment_1.exp1_controller import Experiment1Controller
 from experiments.experiment import Experiment
 from topologies.awad_topology import AwadDDoSTopology
@@ -30,7 +30,7 @@ class Experiment1(Experiment):
 
         for i in range(8):
             h = hosts[i]
-            script = (Environment.get_environment().shared_host_programs_path /
+            script = (Environment.get_environment().host_programs_path /
                       'poisson_udp_host_program.py')
             candidates = [r for r in receivers if r is not h]
             target = self.rng.choice(candidates)

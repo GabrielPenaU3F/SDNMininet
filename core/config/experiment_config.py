@@ -3,7 +3,7 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Optional
 
-from config.environment import Environment
+from core.config.environment import Environment
 
 
 class ExperimentConfig:

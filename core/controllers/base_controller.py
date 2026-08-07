@@ -16,7 +16,7 @@ from ryu.ofproto import ofproto_v1_3
 
 from core.controllers.rules.packetin_rules import install_port_to_mac_rule
 from core.controllers.rules.setup_rules import install_send_everything_to_controller_rule, install_discard_ipv6_traffic_rule
-from config.environment import Environment
+from core.config.environment import Environment
 
 
 class BaseController(app_manager.RyuApp, ABC):

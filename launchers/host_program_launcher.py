@@ -1,6 +1,6 @@
 from typing import List
 
-from config.environment import Environment
+from core.config.environment import Environment
 
 class HostProgramLauncher:
 

@@ -2,7 +2,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from config.experiment_config import ExperimentConfig
+from core.config.experiment_config import ExperimentConfig
 from tests.dummies.dummy_experiment import DummyExperiment, FailingExperiment
 
 

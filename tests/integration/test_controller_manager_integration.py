@@ -1,4 +1,4 @@
-from config.experiment_config import ExperimentConfig
+from core.config.experiment_config import ExperimentConfig
 from core.controllers.base_controller import BaseController
 from infrastructure.controller_manager import ControllerManager
 

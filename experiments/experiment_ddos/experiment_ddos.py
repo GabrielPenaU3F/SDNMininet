@@ -1,4 +1,4 @@
-from config.environment import Environment
+from core.config.environment import Environment
 from core.controllers.base_controller import BaseController
 from experiments.experiment import Experiment
 from topologies.awad_topology import AwadDDoSTopology
@@ -23,7 +23,7 @@ class ExperimentDDoS(Experiment):
 
         for i in range(8):
             h = hosts[i]
-            script = (Environment.get_environment().shared_host_programs_path /
+            script = (Environment.get_environment().host_programs_path /
                       'poisson_udp_host_program.py')
             current_receiver_set = receivers - {h}
             target = self.rng.choice(list(current_receiver_set))

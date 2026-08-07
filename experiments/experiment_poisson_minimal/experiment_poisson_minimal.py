@@ -1,4 +1,4 @@
-from config.environment import Environment
+from core.config.environment import Environment
 from experiments.experiment_debug.debug_controller import DebugController
 from experiments.experiment import Experiment
 from topologies.simple_topology import SimpleTopology
@@ -11,7 +11,7 @@ class ExperimentPoissonMinimal(Experiment):
         rate = 10
         seed = 1
 
-        path = Environment.get_environment().shared_host_programs_path
+        path = Environment.get_environment().host_programs_path
         sender_script = path / 'poisson_udp_host_program.py'
         receiver_script = path / 'silent_receiver_host_program.py'
 

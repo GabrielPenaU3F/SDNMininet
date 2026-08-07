@@ -31,6 +31,10 @@ class Environment:
         return self.project_root / 'experiments'
 
     @property
+    def host_programs_path(self):
+        return self.project_root / 'host_programs'
+
+    @property
     def temp_path(self) -> Path:
         return self.project_root / 'temp'
 
@@ -47,14 +51,11 @@ class Environment:
         return self.project_root / '.venv' / 'bin' / 'ryu-manager'
 
     @property
-    def shared_host_programs_path(self):
-        return self.experiments_path / 'shared_host_programs'
-
-    @property
     def _required_directories(self):
         return (
             self.topologies_path,
             self.experiments_path,
+            self.host_programs_path,
             self.temp_path,
         )
 

@@ -2,7 +2,7 @@ from argparse import Namespace
 
 import pytest
 
-from config.experiment_config import ExperimentConfig
+from core.config.experiment_config import ExperimentConfig
 
 
 @pytest.fixture

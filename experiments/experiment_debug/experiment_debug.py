@@ -1,4 +1,4 @@
-from config.environment import Environment
+from core.config.environment import Environment
 from experiments.experiment_debug.debug_controller import DebugController
 from experiments.experiment import Experiment
 from topologies.simple_topology import SimpleTopology
@@ -10,7 +10,7 @@ class ExperimentDebug(Experiment):
         h1 = self.net['h1']
         h2 = self.net['h2']
 
-        path = Environment.get_environment().shared_host_programs_path
+        path = Environment.get_environment().host_programs_path
 
         self.program_launcher.launch(
             h2,

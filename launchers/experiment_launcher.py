@@ -2,7 +2,7 @@ import argparse
 import os
 import sys
 
-from config.experiment_config import ExperimentConfig
+from core.config.experiment_config import ExperimentConfig
 
 
 class ExperimentLauncher:
