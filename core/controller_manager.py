@@ -2,7 +2,6 @@ import inspect
 import socket
 import subprocess
 import time
-from pathlib import Path
 
 from core.config.environment import Environment
 from core.config.experiment_config import ExperimentConfig
@@ -36,7 +35,7 @@ class ControllerManager:
         stderr = open(config.stdout_path / 'controller.err', 'w')
 
         env_dict = Environment.get_env_dict().copy()
-        env_dict['EXPERIMENT_CFG'] = str(self.config.experiment_root / 'cfg.json')
+        env_dict['EXPERIMENT_CFG'] = str(config.config_file)
         proc = subprocess.Popen(
             [
                 ryu_manager,
@@ -54,26 +53,22 @@ class ControllerManager:
         return proc
 
     def _wait_until_ready(self):
-        try:
-            deadline = time.monotonic() + self._timeout
-            socket_path = Environment.get_environment().controller_ready_sock
+        deadline = time.monotonic() + self._timeout
+        socket_path = Environment.get_environment().controller_ready_sock
 
-            while True:
+        while True:
 
-                if self._timed_out(deadline):
-                    raise TimeoutError( f'Controller was not correctly initialized')
+            if self._timed_out(deadline):
+                raise TimeoutError( f'Controller was not correctly initialized')
 
-                if not self._is_process_alive():
-                    raise RuntimeError(f'Controller ended unexpectedly with code {self._process.returncode}')
+            if not self._is_process_alive():
+                raise RuntimeError(f'Controller ended unexpectedly with code {self._process.returncode}')
 
-                if self._is_controller_ready(socket_path):
-                    return
+            if self._is_controller_ready(socket_path):
+                return
 
-                time.sleep(1)
+            time.sleep(1)
 
-        except RuntimeError:
-            print((self.config.stdout_path / "controller.err").read_text())
-            print((self.config.stdout_path / "controller.out").read_text())
 
     def _is_process_alive(self) -> bool:
         return self._process.poll() is None
