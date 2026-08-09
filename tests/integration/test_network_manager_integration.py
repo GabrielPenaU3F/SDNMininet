@@ -11,7 +11,7 @@ from topologies.simple_topology import SimpleTopology
 def network_manager_with_simple_topo():
     manager = NetworkManager(SimpleTopology)
     yield manager
-    manager.stop()
+    manager.destroy_network()
 
 class TestNetworkManagerIntegration:
 
@@ -19,13 +19,6 @@ class TestNetworkManagerIntegration:
         manager = network_manager_with_simple_topo
         manager.build_network()
 
-        assert manager.net is not None
-        assert isinstance(manager.net, Mininet)
-
-    def test_manager_starts_real_network(self, network_manager_with_simple_topo):
-        manager = network_manager_with_simple_topo
-        manager.build_network()
-        manager.start()
         h1 = manager.host('h1')
         h2 = manager.host('h2')
         s1 = manager.switch('s1')
@@ -37,21 +30,48 @@ class TestNetworkManagerIntegration:
         assert s1 is not None
         assert isinstance(s1, OVSSwitch) # Eventually change if we wrap switches too
 
-    def test_network_hosts_are_running(self, network_manager_with_simple_topo):
+        assert manager.net is not None
+        assert isinstance(manager.net, Mininet)
+
+    # This should be done without any error
+    def test_destroy_removes_built_network(self, network_manager_with_simple_topo):
         manager = network_manager_with_simple_topo
         manager.build_network()
-        manager.start()
+        manager.destroy_network()
+        manager.build_network()
+
+    def test_manager_starts_and_stops_real_network(self):
+        manager = NetworkManager(SimpleTopology)
+        manager.build_network()
+        manager.start_network()
+        assert manager.network_online
+        manager.stop_network()
+        assert not manager.network_online
+
+    def test_network_hosts_are_running_when_network_starts(self, network_manager_with_simple_topo):
+        manager = network_manager_with_simple_topo
+        manager.build_network()
+        manager.start_network()
 
         h = manager.host('h1')
         assert h.cmd('echo hello').strip() == 'hello'
 
-    # def test_manager_stops_real_network(self, network_manager_with_simple_topo):
-    #     manager = NetworkManager(SimpleTopology)
-    #     manager.build_network()
-    #     manager.start()
-    #
-    #     h = manager.host('h1')
-    #     manager.stop()
-    #
-    #     with pytest.raises(NetworkError):
-    #         assert h.cmd('echo hello')
+    def test_network_hosts_are_not_running_when_network_has_not_started(self, network_manager_with_simple_topo):
+        manager = network_manager_with_simple_topo
+        manager.build_network()
+
+        h = manager.host('h1')
+        with pytest.raises(NetworkError, match='Host h1 is not active'):
+            h.cmd('echo hello')
+
+    def test_network_hosts_are_not_running_when_network_stops(self, network_manager_with_simple_topo):
+        manager = network_manager_with_simple_topo
+        manager.build_network()
+        manager.start_network()
+        manager.stop_network()
+
+        h = manager.host('h1')
+        with pytest.raises(NetworkError, match='Host h1 is not active'):
+            h.cmd('echo hello')
+
+    # TODO: fix integration test still not passing

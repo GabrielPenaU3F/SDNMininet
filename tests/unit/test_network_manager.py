@@ -109,16 +109,22 @@ class TestStart:
 
     def test_start_starts_network(self, network_manager):
         network_manager.net = Mock()
-        network_manager.start()
+        network_manager.start_network()
         network_manager.net.start.assert_called_once()
         assert network_manager.network_online
+
+    def test_start_does_nothing_if_network_is_already_running(self, network_manager):
+        network_manager.net = Mock()
+        network_manager._running = True
+        network_manager.start_network()
+        network_manager.net.start.assert_not_called()
 
     def test_network_manager_starts_hosts(self, network_manager):
         network_manager.net = Mock()
         h1 = Mock()
         h2 = Mock()
         network_manager._hosts = {'h1': h1, 'h2': h2}
-        network_manager.start()
+        network_manager.start_network()
         network_manager.net.start.assert_called_once()
         h1._start.assert_called_once()
         h2._start.assert_called_once()
@@ -127,8 +133,63 @@ class TestStop:
 
     def test_stop_stops_network(self, network_manager):
         network_manager.net = Mock()
-        network_manager.stop()
-        network_manager.net.stop.assert_called_once()
+        network_manager._running = True
+        network_manager.stop_network()
+        assert network_manager._running is False
 
     def test_stop_does_nothing_if_network_was_not_created(self, network_manager):
-        network_manager.stop()
+        network_manager.stop_network()
+
+    def test_stop_does_nothing_if_network_is_not_running(self, network_manager):
+        network_manager.net = Mock()
+        network_manager._running = False
+        network_manager.stop_network()
+        network_manager.net.stop.assert_not_called()
+
+    def test_stop_stops_hosts(self, network_manager):
+        network_manager.net = Mock()
+        network_manager._running = True
+
+        h1 = Mock()
+        h2 = Mock()
+        network_manager._hosts = {'h1': h1, 'h2': h2}
+
+        network_manager.stop_network()
+
+        h1._stop.assert_called_once()
+        h2._stop.assert_called_once()
+        assert not network_manager.network_online
+
+    def test_stop_does_not_destroy_network_infrastructure(self, network_manager):
+        network_manager.net = Mock()
+        network_manager._running = True
+        network_manager.stop_network()
+        network_manager.net.stop.assert_not_called()
+        assert network_manager.net is not None
+
+class TestDestroy:
+
+    def test_destroy_stops_mininet_network(self, network_manager):
+        net = Mock()
+        network_manager.net = net
+        network_manager.destroy_network()
+        net.stop.assert_called_once()
+        assert network_manager.net is None
+
+    def test_destroy_stops_hosts_before_destroying_network(self, network_manager):
+        net = Mock()
+        network_manager.net = net
+        network_manager.start_network()
+
+        h1 = Mock()
+        h2 = Mock()
+        network_manager._hosts = {'h1': h1, 'h2': h2}
+
+        network_manager.destroy_network()
+
+        h1._stop.assert_called_once()
+        h2._stop.assert_called_once()
+        net.stop.assert_called_once()
+        assert not network_manager.network_online
+        assert network_manager._hosts == {}
+        assert network_manager.net is None

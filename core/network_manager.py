@@ -36,20 +36,31 @@ class NetworkManager:
     def network_online(self):
         return self._running
 
+    # Starts only networks that are offline
     # noinspection PyProtectedMember
-    def start(self):
-        self.net.start()
-        self._running = True
-        for host in self._hosts.values():
-            host._start()
+    def start_network(self):
+        if self.net is not None and not self._running:
+            self.net.start()
+            self._running = True
+            for host in self._hosts.values():
+                host._start()
 
+    # Stops only networks that are online. Does not destroy them
     # noinspection PyProtectedMember
-    def stop(self):
-        if self.net is not None:
+    def stop_network(self):
+        # TODO: stop every process running inside hosts.
+        if self.net is not None and self._running:
             for host in self._hosts.values():
                 host._stop()
             self._running = False
+
+    # Forces stop and clears manager
+    def destroy_network(self):
+        if self.net is not None:
+            self.stop_network()
             self.net.stop()
+            self._hosts.clear()
+            self.net = None
 
     # This does NOT support switches
     def _wrap_hosts(self):

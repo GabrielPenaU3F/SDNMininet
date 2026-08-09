@@ -32,10 +32,10 @@ class Experiment(ABC):
         self._clean_sdn()
         self.controller_mgr.start(self.config)
         self.network_mgr.build_network(**kwargs)
-        self.network_mgr.start()
+        self.network_mgr.start_network()
 
     def shutdown(self):
-        self.network_mgr.stop()
+        self.network_mgr.stop_network()
         self.controller_mgr.stop()
 
     @staticmethod
