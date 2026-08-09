@@ -24,19 +24,23 @@ def make_mininet_patch(monkeypatch):
         )
     return _make
 
+@pytest.fixture()
+def net_mock(make_mininet_patch):
+    net_mock = Mock()
+    net_mock.nameToNode = {}
+    make_mininet_patch(net_mock)
+    return net_mock
+
 
 class TestBuildNetwork:
 
-    def test_build_network_creates_net(self, monkeypatch, network_manager, make_mininet_patch):
-        net_mock = Mock()
-        make_mininet_patch(net_mock)
+    def test_build_network_creates_net(self, network_manager, net_mock):
         net = network_manager.build_network()
         assert network_manager.net is net
 
-    def test_build_network_uses_given_topology(self, monkeypatch, network_manager, make_mininet_patch):
+    # noinspection PyUnresolvedReferences
+    def test_build_network_uses_given_topology(self, monkeypatch, network_manager, net_mock):
         topo = Mock()
-        net_mock = Mock()
-        make_mininet_patch(net_mock)
 
         monkeypatch.setattr(
             network_manager,
@@ -52,9 +56,7 @@ class TestBuildNetwork:
             autoSetMacs=False
         )
 
-    def test_build_network_adds_remote_controller(self, monkeypatch, network_manager, make_mininet_patch):
-        mock_net = Mock()
-        make_mininet_patch(mock_net)
+    def test_build_network_adds_remote_controller(self, network_manager, net_mock):
         net = network_manager.build_network()
 
         net.addController.assert_called_once_with(
@@ -64,9 +66,7 @@ class TestBuildNetwork:
             port=6633
         )
 
-    def test_build_network_accepts_custom_controller_address(self, monkeypatch, network_manager, make_mininet_patch):
-        mock_net = Mock()
-        make_mininet_patch(mock_net)
+    def test_build_network_accepts_custom_controller_address(self, network_manager, net_mock):
 
         net = network_manager.build_network(
             controller_ip='10.0.0.5',
@@ -85,7 +85,6 @@ class TestManagerWrapsHosts:
 
     def test_manager_wraps_each_host_in_the_network(self, network_manager, make_mininet_patch):
         net_mock = Mock()
-
         mn_h1 = Mock(spec=MininetHost)
         mn_h1.name = 'h1'
 
@@ -112,6 +111,17 @@ class TestStart:
         network_manager.net = Mock()
         network_manager.start()
         network_manager.net.start.assert_called_once()
+        assert network_manager.network_online
+
+    def test_network_manager_starts_hosts(self, network_manager):
+        network_manager.net = Mock()
+        h1 = Mock()
+        h2 = Mock()
+        network_manager._hosts = {'h1': h1, 'h2': h2}
+        network_manager.start()
+        network_manager.net.start.assert_called_once()
+        h1._start.assert_called_once()
+        h2._start.assert_called_once()
 
 class TestStop:
 
