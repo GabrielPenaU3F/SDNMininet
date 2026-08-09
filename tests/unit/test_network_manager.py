@@ -35,7 +35,7 @@ def net_mock(make_mininet_patch):
 class TestBuildNetwork:
 
     def test_build_network_creates_net(self, network_manager, net_mock):
-        net = network_manager.build_network()
+        net = network_manager._build_network()
         assert network_manager.net is net
 
     # noinspection PyUnresolvedReferences
@@ -48,7 +48,7 @@ class TestBuildNetwork:
             Mock(return_value=topo)
         )
 
-        network_manager.build_network()
+        network_manager._build_network()
 
         network_module.Mininet.assert_called_once_with(
             topo=topo,
@@ -57,7 +57,7 @@ class TestBuildNetwork:
         )
 
     def test_build_network_adds_remote_controller(self, network_manager, net_mock):
-        net = network_manager.build_network()
+        net = network_manager._build_network()
 
         net.addController.assert_called_once_with(
             'c0',
@@ -68,7 +68,7 @@ class TestBuildNetwork:
 
     def test_build_network_accepts_custom_controller_address(self, network_manager, net_mock):
 
-        net = network_manager.build_network(
+        net = network_manager._build_network(
             controller_ip='10.0.0.5',
             controller_port=9999
         )
@@ -97,7 +97,7 @@ class TestManagerWrapsHosts:
         }
 
         make_mininet_patch(net_mock)
-        network_manager.build_network()
+        network_manager._build_network()
 
         assert isinstance(network_manager.host('h1'), Host)
         assert isinstance(network_manager.host('h2'), Host)

@@ -19,7 +19,7 @@ class TestNetworkManagerIntegration:
 
     def test_manager_builds_real_network(self, network_manager_with_simple_topo):
         manager = network_manager_with_simple_topo
-        manager.build_network()
+        manager._build_network()
 
         h1 = manager.host('h1')
         h2 = manager.host('h2')
@@ -38,13 +38,13 @@ class TestNetworkManagerIntegration:
     # This should be done without any error
     def test_destroy_removes_built_network(self, network_manager_with_simple_topo):
         manager = network_manager_with_simple_topo
-        manager.build_network()
+        manager._build_network()
         manager.destroy_network()
-        manager.build_network()
+        manager._build_network()
 
     def test_manager_starts_and_stops_real_network(self, network_manager_with_simple_topo):
         manager = network_manager_with_simple_topo
-        manager.build_network()
+        manager._build_network()
         manager.start_network()
         assert manager.network_online
         manager.stop_network()
@@ -52,7 +52,7 @@ class TestNetworkManagerIntegration:
 
     def test_network_hosts_are_running_when_network_starts(self, network_manager_with_simple_topo):
         manager = network_manager_with_simple_topo
-        manager.build_network()
+        manager._build_network()
         manager.start_network()
 
         h = manager.host('h1')
@@ -60,7 +60,7 @@ class TestNetworkManagerIntegration:
 
     def test_network_hosts_are_not_running_when_network_has_not_started(self, network_manager_with_simple_topo):
         manager = network_manager_with_simple_topo
-        manager.build_network()
+        manager._build_network()
 
         h = manager.host('h1')
         with pytest.raises(NetworkError, match='Host h1 is not active'):
@@ -68,7 +68,7 @@ class TestNetworkManagerIntegration:
 
     def test_network_hosts_are_not_running_when_network_stops(self, network_manager_with_simple_topo):
         manager = network_manager_with_simple_topo
-        manager.build_network()
+        manager._build_network()
         manager.start_network()
         manager.stop_network()
 

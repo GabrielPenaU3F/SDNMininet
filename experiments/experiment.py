@@ -29,28 +29,18 @@ class Experiment(ABC):
                 self.shutdown()
 
     def deploy_infrastructure(self, **kwargs):
-        self._clean_sdn()
         self.controller_mgr.start(self.config)
-        self.network_mgr.build_network(**kwargs)
-        self.network_mgr.start_network()
+        self.network_mgr.deploy(**kwargs)
 
     def shutdown(self):
-        self.network_mgr.stop_network()
+        self.network_mgr.destroy_network()
         self.controller_mgr.stop()
-
-    @staticmethod
-    def _clean_sdn():
-        mn_clean.cleanup()
 
     def _wait_until_finished(self):
         deadline = time.monotonic() + self.config.duration
 
         while time.monotonic() < deadline:
             time.sleep(0.5)
-
-    @property
-    def net(self):
-        return self.network_mgr.net
 
     # === To be implemented by each subclass ===
 

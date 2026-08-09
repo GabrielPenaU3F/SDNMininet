@@ -7,8 +7,8 @@ from topologies.simple_topology import SimpleTopology
 class ExperimentDebug(Experiment):
 
     def begin(self):
-        h1 = self.net['h1']
-        h2 = self.net['h2']
+        h1 = self.network_mgr.host('h1')
+        h2 = self.network_mgr.host('h2')
 
         path = Environment.get_environment().host_programs_path
 
@@ -19,7 +19,7 @@ class ExperimentDebug(Experiment):
 
         self.program_launcher.launch(
             h1,
-            script_path=path / "debug_sender.py"
+            script_path=path / 'debug_sender.py'
         )
 
     @property

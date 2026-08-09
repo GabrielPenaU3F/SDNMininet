@@ -1,4 +1,4 @@
-from mininet.clean import Cleanup
+import mininet.clean as mn_clean
 from mininet.net import Mininet
 from mininet.node import RemoteController
 from mininet.node import Host as MininetHost, Switch as MininetSwitch
@@ -14,7 +14,14 @@ class NetworkManager:
         self._running = False
         self._hosts = {}
 
-    def build_network(self, controller_ip='127.0.0.1', controller_port=6633):
+    def deploy(self, controller_ip='127.0.0.1', controller_port=6633):
+        if self.net is not None:
+            self.destroy_network()
+
+        self._build_network(controller_ip, controller_port)
+        self.start_network()
+
+    def _build_network(self, controller_ip='127.0.0.1', controller_port=6633):
         topo = self.topology_cls()
         try:
             net = Mininet(
@@ -62,11 +69,10 @@ class NetworkManager:
 
     # Forces stop and clears manager
     def destroy_network(self):
-        if self.net is not None:
-            self.stop_network()
-            self.net.stop()
-            self._hosts.clear()
-            self.net = None
+        self.stop_network()
+        self.net.stop()
+        self._hosts.clear()
+        self.net = None
 
     # This does NOT support switches
     def _wrap_hosts(self):
@@ -87,4 +93,4 @@ class NetworkManager:
 
     @staticmethod
     def _clean_network():
-        Cleanup.cleanup()
+        mn_clean.cleanup()
