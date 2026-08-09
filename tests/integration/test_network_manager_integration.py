@@ -1,3 +1,5 @@
+import subprocess
+
 import pytest
 from mininet.net import Mininet
 from mininet.node import OVSSwitch
@@ -40,8 +42,8 @@ class TestNetworkManagerIntegration:
         manager.destroy_network()
         manager.build_network()
 
-    def test_manager_starts_and_stops_real_network(self):
-        manager = NetworkManager(SimpleTopology)
+    def test_manager_starts_and_stops_real_network(self, network_manager_with_simple_topo):
+        manager = network_manager_with_simple_topo
         manager.build_network()
         manager.start_network()
         assert manager.network_online
@@ -74,4 +76,3 @@ class TestNetworkManagerIntegration:
         with pytest.raises(NetworkError, match='Host h1 is not active'):
             h.cmd('echo hello')
 
-    # TODO: fix integration test still not passing

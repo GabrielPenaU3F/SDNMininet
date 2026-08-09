@@ -1,3 +1,4 @@
+from mininet.clean import Cleanup
 from mininet.net import Mininet
 from mininet.node import RemoteController
 from mininet.node import Host as MininetHost, Switch as MininetSwitch
@@ -15,18 +16,23 @@ class NetworkManager:
 
     def build_network(self, controller_ip='127.0.0.1', controller_port=6633):
         topo = self.topology_cls()
-        net = Mininet(
-            topo=topo,
-            controller=None,
-            autoSetMacs=False
-        )
+        try:
+            net = Mininet(
+                topo=topo,
+                controller=None,
+                autoSetMacs=False
+            )
 
-        net.addController(
-            'c0',
-            controller=RemoteController,
-            ip=controller_ip,
-            port=controller_port
-        )
+            net.addController(
+                'c0',
+                controller=RemoteController,
+                ip=controller_ip,
+                port=controller_port
+            )
+
+        except Exception:
+            self._clean_network()
+            raise
 
         self.net = net
         self._wrap_hosts()
@@ -78,3 +84,7 @@ class NetworkManager:
         if isinstance(switch, MininetSwitch):
             return switch
         return None
+
+    @staticmethod
+    def _clean_network():
+        Cleanup.cleanup()
