@@ -1,3 +1,10 @@
+import json
+from pathlib import Path
+
+from core.config.environment import Environment
+from hosts.host_app import HostApp, HostAppContext
+
+
 class Host:
 
     def __init__(self, mn_host):
@@ -24,9 +31,41 @@ class Host:
         self.process = self.mn_host.popen(*args, **kwargs)
         return self.process
 
-    def launch_app(self, app):
+    def launch_app(self, app: HostApp, app_context: HostAppContext, **kwargs):
         if self.app is not None:
             raise RuntimeError(f'Host {self.name} already has an application running')
 
+        command = self._build_app_command(app, **kwargs)
+
+        stdout = open(app_context.stdout_path / f'{self.name}.out', 'w')
+        stderr = open(app_context.stdout_path / f'{self.name}.err', 'w')
+
+        self.process = self.popen(
+            command,
+            env=Environment.get_env_dict(),
+            cwd=app_context.experiment_root,
+            stdout=stdout,
+            stderr=stderr
+        )
         self.app = app
-        self.process = self.popen(app.command())
+
+        stdout.close()
+        stderr.close()
+
+
+    @staticmethod
+    def _build_app_command(app, **kwargs):
+        python_path = str(Environment.get_environment().python_path)
+        runner_path = str(Path(__file__).with_name('host_app_runner.py'))
+
+        command = [
+            python_path,
+            runner_path,
+            '--app-module',
+            type(app).__module__,
+            '--app-class',
+            type(app).__name__,
+            '--app-kwargs',
+            json.dumps(kwargs)
+        ]
+        return command

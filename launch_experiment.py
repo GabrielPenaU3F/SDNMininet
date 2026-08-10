@@ -1,4 +1,4 @@
-from core.launchers.experiment_launcher import ExperimentLauncher
+from core.experiment_launcher import ExperimentLauncher
 from experiments.registry import EXPERIMENTS
 
 

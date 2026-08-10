@@ -1,7 +1,6 @@
-from core.config.environment import Environment
 from core.controllers.debug_controller import DebugController
 from experiments.experiment import Experiment
-from hosts.host_apps.debug_apps import SilentListenerHostApp, DeafSpeakerHostApp
+from hosts.host_apps.minimal_apps import SilentListenerHostApp, DeafSpeakerHostApp
 from topologies.simple_topology import SimpleTopology
 
 

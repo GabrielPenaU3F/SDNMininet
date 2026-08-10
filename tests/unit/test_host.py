@@ -1,15 +1,32 @@
+from pathlib import Path
+
 import pytest
 
 from unittest.mock import Mock
 
+from core.config.environment import Environment
 from hosts.host import Host
+from hosts.host_app import HostAppContext
+from tests.utilities.dummy_host_apps import DummyTestHostApp
+
 
 @pytest.fixture
-def example_host():
+def dummy_mn_host():
     mn_host = Mock()
     mn_host.name = 'h1'
     mn_host.IP.return_value = '127.0.0.1'
-    return Host(mn_host)
+    process = object()
+    mn_host.popen.return_value = process
+    return mn_host
+
+@pytest.fixture
+def example_host(dummy_mn_host):
+    return Host(dummy_mn_host)
+
+@pytest.fixture
+def example_context(tmp_path):
+    return HostAppContext(experiment_root=tmp_path, stdout_path=tmp_path)
+
 
 class TestHost:
 
@@ -41,3 +58,63 @@ class TestHost:
             'script.py',
             foo='bar'
         )
+
+
+class TestLaunchApp:
+
+    def test_launch_stores_app_and_process(self, example_host, example_context):
+        app = DummyTestHostApp()
+        example_host.launch_app(app, example_context)
+
+        assert example_host.app is app
+        assert example_host.process is example_host.mn_host.popen.return_value
+
+    def test_launch_invokes_popen_with_expected_command(self, example_host, example_context):
+        app = DummyTestHostApp()
+        example_host.launch_app(
+            app,
+            example_context,
+            rate=100,
+            duration=60
+        )
+        args, kwargs = example_host.mn_host.popen.call_args
+        command = args[0]
+
+        assert command[0] == str(Environment.get_environment().python_path)
+        assert Path(command[1]).name == 'host_app_runner.py'
+        assert command[2:] == [
+            '--app-module',
+            DummyTestHostApp.__module__,
+            '--app-class',
+            DummyTestHostApp.__name__,
+            '--app-kwargs',
+            '{"rate": 100, "duration": 60}'
+        ]
+
+    def test_launch_invokes_popen_with_expected_kwargs(self, example_host, example_context):
+        app = DummyTestHostApp()
+        example_host.launch_app(
+            app,
+            example_context,
+            rate=100,
+            duration=60
+        )
+
+        args, kwargs = example_host.mn_host.popen.call_args
+
+        assert kwargs['env']['PYTHONPATH'] == str(
+            Environment.get_environment().project_root
+        )
+        assert kwargs['cwd'] == example_context.experiment_root
+        assert kwargs['stdout'].name == str(
+            example_context.stdout_path / 'h1.out'
+        )
+        assert kwargs['stderr'].name == str(
+            example_context.stdout_path / 'h1.err'
+        )
+
+    # noinspection PyTypeChecker
+    def test_launch_app_fails_if_an_application_is_already_running(self, example_host, example_context):
+        example_host.launch_app(DummyTestHostApp, example_context)
+        with pytest.raises(RuntimeError, match='Host h1 already has an application running'):
+            example_host.launch_app(DummyTestHostApp, example_context)

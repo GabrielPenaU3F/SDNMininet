@@ -4,7 +4,7 @@ import pytest
 
 from unittest.mock import Mock
 
-from core.launchers.experiment_launcher import ExperimentLauncher
+from core.experiment_launcher import ExperimentLauncher
 from tests.dummies.dummy_experiment import DummyExperiment
 
 
