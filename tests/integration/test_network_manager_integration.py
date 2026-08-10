@@ -1,11 +1,9 @@
-import subprocess
-
 import pytest
 from mininet.net import Mininet
+from mininet.node import Host as MininetHost
 from mininet.node import OVSSwitch
 
 from core.network_manager import NetworkManager
-from errors import NetworkError
 from hosts.host import Host
 from topologies.simple_topology import SimpleTopology
 
@@ -19,17 +17,16 @@ class TestNetworkManagerIntegration:
 
     def test_manager_builds_real_network(self, network_manager_with_simple_topo):
         manager = network_manager_with_simple_topo
-        manager._build_network()
+        manager.deploy_network()
 
         h1 = manager.host('h1')
         h2 = manager.host('h2')
         s1 = manager.switch('s1')
 
-        assert h1 is not None
         assert isinstance(h1, Host)
-        assert h2 is not None
+        assert isinstance(h1.mn_host, MininetHost)
         assert isinstance(h2, Host)
-        assert s1 is not None
+        assert isinstance(h2.mn_host, MininetHost)
         assert isinstance(s1, OVSSwitch) # Eventually change if we wrap switches too
 
         assert manager.net is not None
@@ -38,41 +35,21 @@ class TestNetworkManagerIntegration:
     # This should be done without any error
     def test_destroy_removes_built_network(self, network_manager_with_simple_topo):
         manager = network_manager_with_simple_topo
-        manager._build_network()
+        manager.deploy_network()
         manager.destroy_network()
-        manager._build_network()
-
-    def test_manager_starts_and_stops_real_network(self, network_manager_with_simple_topo):
-        manager = network_manager_with_simple_topo
-        manager._build_network()
-        manager.start_network()
-        assert manager.network_online
-        manager.stop_network()
-        assert not manager.network_online
+        manager.deploy_network()
 
     def test_network_hosts_are_running_when_network_starts(self, network_manager_with_simple_topo):
         manager = network_manager_with_simple_topo
-        manager._build_network()
-        manager.start_network()
+        manager.deploy_network()
 
         h = manager.host('h1')
         assert h.cmd('echo hello').strip() == 'hello'
 
-    def test_network_hosts_are_not_running_when_network_has_not_started(self, network_manager_with_simple_topo):
+    def test_destroy_removes_network(self, network_manager_with_simple_topo):
         manager = network_manager_with_simple_topo
-        manager._build_network()
+        manager.deploy_network()
+        manager.destroy_network()
 
-        h = manager.host('h1')
-        with pytest.raises(NetworkError, match='Host h1 is not active'):
-            h.cmd('echo hello')
-
-    def test_network_hosts_are_not_running_when_network_stops(self, network_manager_with_simple_topo):
-        manager = network_manager_with_simple_topo
-        manager._build_network()
-        manager.start_network()
-        manager.stop_network()
-
-        h = manager.host('h1')
-        with pytest.raises(NetworkError, match='Host h1 is not active'):
-            h.cmd('echo hello')
-
+        assert manager.net is None
+        assert manager._hosts == {}

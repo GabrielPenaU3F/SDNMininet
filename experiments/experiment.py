@@ -30,7 +30,7 @@ class Experiment(ABC):
 
     def deploy_infrastructure(self, **kwargs):
         self.controller_mgr.start(self.config)
-        self.network_mgr.deploy(**kwargs)
+        self.network_mgr.deploy_network(**kwargs)
 
     def shutdown(self):
         self.network_mgr.destroy_network()

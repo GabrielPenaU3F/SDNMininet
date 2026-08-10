@@ -42,18 +42,10 @@ class TestExperiment:
         dummy_experiment.controller_mgr = Mock()
         dummy_experiment.network_mgr = Mock()
 
-        monkeypatch.setattr(
-            dummy_experiment,
-            '_clean_sdn',
-            Mock()
-        )
-
         dummy_experiment.deploy_infrastructure()
 
-        dummy_experiment._clean_sdn.assert_called_once()
         dummy_experiment.controller_mgr.start.assert_called_once()
-        dummy_experiment.network_mgr.build_network.assert_called_once()
-        dummy_experiment.network_mgr.start_network.assert_called_once()
+        dummy_experiment.network_mgr.deploy_network.assert_called_once()
 
     def test_shutdown(self, dummy_experiment):
         dummy_experiment.controller_mgr = Mock()
@@ -61,7 +53,7 @@ class TestExperiment:
 
         dummy_experiment.shutdown()
 
-        dummy_experiment.network_mgr.stop_network.assert_called_once()
+        dummy_experiment.network_mgr.destroy_network.assert_called_once()
         dummy_experiment.controller_mgr.stop.assert_called_once()
 
     def test_shutdown_is_called_even_if_run_fails(self, failing_experiment):

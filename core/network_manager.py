@@ -11,15 +11,15 @@ class NetworkManager:
     def __init__(self, topology_cls, **kwargs):
         self.topology_cls = topology_cls
         self.net = None
-        self._running = False
         self._hosts = {}
 
-    def deploy(self, controller_ip='127.0.0.1', controller_port=6633):
+    def deploy_network(self, controller_ip='127.0.0.1', controller_port=6633):
         if self.net is not None:
             self.destroy_network()
 
-        self._build_network(controller_ip, controller_port)
-        self.start_network()
+        self.net = self._build_network(controller_ip, controller_port)
+        self._wrap_hosts()
+        self.net.start()
 
     def _build_network(self, controller_ip='127.0.0.1', controller_port=6633):
         topo = self.topology_cls()
@@ -41,40 +41,27 @@ class NetworkManager:
             self._clean_network()
             raise
 
-        self.net = net
-        self._wrap_hosts()
         return net
 
     @property
     def network_online(self):
-        return self._running
+        return self.net is not None
 
-    # Starts only networks that are offline
     # noinspection PyProtectedMember
-    def start_network(self):
-        if self.net is not None and not self._running:
-            self.net.start()
-            self._running = True
-            for host in self._hosts.values():
-                host._start()
-
-    # Stops only networks that are online. Does not destroy them
-    # noinspection PyProtectedMember
-    def stop_network(self):
+    def _stop_hosts(self):
         # TODO: stop every process running inside hosts.
-        if self.net is not None and self._running:
-            for host in self._hosts.values():
-                host._stop()
-            self._running = False
+        for host in self._hosts.values():
+            host._stop()
 
-    # Forces stop and clears manager
+    # Stops and destroys the network
     def destroy_network(self):
-        self.stop_network()
-        self.net.stop()
-        self._hosts.clear()
-        self.net = None
+        if self.net is not None:
+            self._stop_hosts()
+            self._hosts.clear()
+            self.net.stop()
+            self.net = None
 
-    # This does NOT support switches
+    # This does NOT support switches - for now, we wrap only hosts
     def _wrap_hosts(self):
         self._hosts = {
             name: Host(mn_host)
