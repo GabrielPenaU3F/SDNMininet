@@ -56,7 +56,7 @@ class Host:
     @staticmethod
     def _build_app_command(app, **kwargs):
         python_path = str(Environment.get_environment().python_path)
-        runner_path = str(Path(__file__).with_name('host_app_runner.py'))
+        runner_path = str(Environment.get_environment().app_runner_path)
 
         command = [
             python_path,

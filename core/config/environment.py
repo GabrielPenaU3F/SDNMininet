@@ -23,12 +23,16 @@ class Environment:
     # Properties
 
     @property
+    def core_path(self) -> Path:
+        return self.project_root / 'core'
+
+    @property
     def experiments_path(self) -> Path:
         return self.project_root / 'experiments'
 
     @property
-    def host_programs_path(self):
-        return self.project_root / 'host_programs'
+    def app_runner_path(self):
+        return self.core_path / 'host_app_runner.py'
 
     @property
     def temp_path(self) -> Path:
@@ -49,8 +53,8 @@ class Environment:
     @property
     def _required_directories(self):
         return (
+            self.core_path,
             self.experiments_path,
-            self.host_programs_path,
             self.temp_path,
         )
 

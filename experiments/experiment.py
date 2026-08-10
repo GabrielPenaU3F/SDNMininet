@@ -6,6 +6,7 @@ import numpy as np
 from core.controller_manager import ControllerManager
 
 from core.network_manager import NetworkManager
+from hosts.host_app import HostAppContext
 
 
 class Experiment(ABC):
@@ -15,6 +16,10 @@ class Experiment(ABC):
         self.rng = np.random.default_rng(seed=self.config.seed)
         self.network_mgr = NetworkManager(self.topology_cls)
         self.controller_mgr = ControllerManager(self.controller_cls)
+        self.app_context = HostAppContext(
+            experiment_root=config.experiment_root,
+            stdout_path=config.stdout_path
+        )
 
     def execute(self):
         with self.config.config_context():

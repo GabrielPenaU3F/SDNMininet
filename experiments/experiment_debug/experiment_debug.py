@@ -7,18 +7,18 @@ from topologies.simple_topology import SimpleTopology
 class ExperimentDebug(Experiment):
 
     def begin(self):
-        h1 = self.network_mgr.host('h1')
-        h2 = self.network_mgr.host('h2')
+        speaker = self.network_mgr.host('h1')
+        listener = self.network_mgr.host('h2')
 
-        self.app_launcher.launch(
-            h2,
+        listener.launch_app(
             SilentListenerHostApp,
+            self.app_context,
             port=100
         )
 
-        self.app_launcher.launch(
-            h1,
+        speaker.launch_app(
             DeafSpeakerHostApp,
+            self.app_context,
             dst_ip='10.0.0.2',
             port=100
         )
