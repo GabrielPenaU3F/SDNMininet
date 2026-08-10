@@ -1,11 +1,10 @@
 import time
 from abc import ABC, abstractmethod
 
-import mininet.clean as mn_clean
 import numpy as np
 
 from core.controller_manager import ControllerManager
-from core.launchers.host_program_launcher import HostProgramLauncher
+from core.launchers.host_app_launcher import HostAppLauncher
 
 from core.network_manager import NetworkManager
 
@@ -15,7 +14,7 @@ class Experiment(ABC):
     def __init__(self, config, **kwargs):
         self.config = config
         self.rng = np.random.default_rng(seed=self.config.seed)
-        self.program_launcher = HostProgramLauncher(self.config)
+        self.app_launcher = HostAppLauncher(self.config)
         self.network_mgr = NetworkManager(self.topology_cls)
         self.controller_mgr = ControllerManager(self.controller_cls)
 

@@ -1,6 +1,7 @@
 from core.config.environment import Environment
 from core.controllers.debug_controller import DebugController
 from experiments.experiment import Experiment
+from hosts.host_apps.debug_apps import SilentListenerHostApp, DeafSpeakerHostApp
 from topologies.simple_topology import SimpleTopology
 
 
@@ -10,16 +11,17 @@ class ExperimentDebug(Experiment):
         h1 = self.network_mgr.host('h1')
         h2 = self.network_mgr.host('h2')
 
-        path = Environment.get_environment().host_programs_path
-
-        self.program_launcher.launch(
+        self.app_launcher.launch(
             h2,
-            script_path=path / "debug_receiver.py"
+            SilentListenerHostApp,
+            port=100
         )
 
-        self.program_launcher.launch(
+        self.app_launcher.launch(
             h1,
-            script_path=path / 'debug_sender.py'
+            DeafSpeakerHostApp,
+            dst_ip='10.0.0.2',
+            port=100
         )
 
     @property

@@ -1,12 +1,13 @@
 from pathlib import Path
 
 from core.controllers.base_controller import BaseController
-from core.launchers.host_program_launcher import HostProgramLauncher
+from core.launchers.host_app_launcher import HostAppLauncher
 from experiments.experiment import Experiment
+from tests.utilities.host_apps import WriteFileTestApp
 from topologies.simple_topology import SimpleTopology
 
 
-class HostProgramIntegrationExperiment(Experiment):
+class HostAppIntegrationExperiment(Experiment):
 
     @property
     def controller_cls(self):
@@ -19,17 +20,18 @@ class HostProgramIntegrationExperiment(Experiment):
     def begin(self):
         h1 = self.network_mgr.host('h1')
 
-        launcher = HostProgramLauncher(self.config)
+        launcher = HostAppLauncher(self.config)
+
         launcher.launch(
             h1,
-            'tests/integration/scripts/create_file.py'
+            WriteFileTestApp
         ).wait()
 
 
-class TestHostProgramLauncherIntegration:
+class TestHostAppLauncherIntegration:
 
-    def test_host_program_runs_inside_experiment_root(self, make_experiment):
-        experiment = make_experiment(HostProgramIntegrationExperiment)
+    def test_host_app_runs_inside_experiment_root(self, make_experiment):
+        experiment = make_experiment(HostAppIntegrationExperiment)
         experiment.execute()
         assert Path(
                 experiment.config.experiment_root

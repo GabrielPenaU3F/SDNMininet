@@ -1,16 +1,19 @@
+import json
+from pathlib import Path
 from typing import List
 
 from core.config.environment import Environment
 from hosts.host import Host
+from hosts.host_app import HostApp
 
 
-class HostProgramLauncher:
+class HostAppLauncher:
 
     def __init__(self, experiment_config):
         self.experiment_config = experiment_config
 
-    def launch(self, host: Host, script_path: str, **kwargs):
-        command = self._build_command(script_path, **kwargs)
+    def launch(self, host: Host, app_cls, **app_kwargs):
+        command = self._build_command(app_cls, **app_kwargs)
         stdout = open(self.experiment_config.stdout_path / f'{host.name}.out', 'w')
         stderr = open(self.experiment_config.stdout_path / f'{host.name}.err', 'w')
 
@@ -27,21 +30,19 @@ class HostProgramLauncher:
         stderr.close()
         return proc
 
-    def _build_command(self, script_path: str, **kwargs) -> List[str]:
+    @staticmethod
+    def _build_command(app_cls, **app_kwargs) -> List[str]:
         python_path = Environment.get_environment().python_path
-        script_path = Environment.get_environment().project_root / script_path
-        args = self._build_command_args(**kwargs)
+        runner_path = str(Path(__file__).with_name('host_app_runner.py'))
+
         command = [
             python_path,
-            script_path,
-            *args
+            runner_path,
+            '--app-module',
+            app_cls.__module__,
+            '--app-class',
+            app_cls.__name__,
+            '--app-kwargs',
+            json.dumps(app_kwargs)
         ]
         return command
-
-    @staticmethod
-    def _build_command_args(**kwargs):
-        args = []
-        for key, value in kwargs.items():
-            args.append(f'--{key}')
-            args.append(str(value))
-        return args
