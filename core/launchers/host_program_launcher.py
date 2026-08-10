@@ -1,19 +1,21 @@
 from typing import List
 
 from core.config.environment import Environment
+from hosts.host import Host
+
 
 class HostProgramLauncher:
 
     def __init__(self, experiment_config):
         self.experiment_config = experiment_config
-        self.processes = []
 
-    def launch(self, mn_host, script_path: str, **kwargs):
+    def launch(self, host: Host, script_path: str, **kwargs):
         command = self._build_command(script_path, **kwargs)
-        stdout = open(self.experiment_config.stdout_path / f'{mn_host.name}.out', 'w')
-        stderr = open(self.experiment_config.stdout_path / f'{mn_host.name}.err', 'w')
+        stdout = open(self.experiment_config.stdout_path / f'{host.name}.out', 'w')
+        stderr = open(self.experiment_config.stdout_path / f'{host.name}.err', 'w')
 
-        proc = mn_host.popen(
+        # This process is also stored in the host
+        proc = host.popen(
             command,
             env=Environment.get_env_dict(),
             cwd=self.experiment_config.experiment_root,

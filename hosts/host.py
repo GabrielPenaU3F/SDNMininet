@@ -2,6 +2,7 @@ class Host:
 
     def __init__(self, mn_host):
         self.mn_host = mn_host
+        self.process = None
 
     #TODO: this should terminate the running process
     def _stop(self):
@@ -19,4 +20,5 @@ class Host:
         return self.mn_host.cmd(*args, **kwargs)
 
     def popen(self, *args, **kwargs):
-        return self.mn_host.popen(*args, **kwargs)
+        self.process = self.mn_host.popen(*args, **kwargs)
+        return self.process
