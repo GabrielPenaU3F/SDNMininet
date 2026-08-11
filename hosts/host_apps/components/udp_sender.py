@@ -16,7 +16,7 @@ class UDPSender:
 
         self.destination = (dst_ip, dst_port)
 
-    def run(self):
+    def begin_sending(self):
         seq = 0
         while True:
             dt = self.process.interarrival_time()

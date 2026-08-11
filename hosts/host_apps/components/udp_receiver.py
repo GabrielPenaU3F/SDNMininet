@@ -11,7 +11,7 @@ class UDPReceiver:
 
         self.socket.bind(('0.0.0.0', port))
 
-    def run(self):
+    def begin_listening(self):
         while True:
             data, sender = self.socket.recvfrom(4096)
             self._print_on_reception(sender, data)

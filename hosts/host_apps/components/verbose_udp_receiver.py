@@ -1,11 +1,12 @@
 import time
 
-from hosts.udp_receiver import UDPReceiver
+from hosts.host_apps.components.udp_receiver import UDPReceiver
 
 
 class VerboseUDPReceiver(UDPReceiver):
 
     def _print_on_reception(self, sender, data):
+        super()._print_on_reception(sender, data)
         seq, send_time = data.decode('utf-8').split(',')
         recv_time = time.monotonic()
         latency = recv_time - float(send_time)

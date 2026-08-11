@@ -1,7 +1,7 @@
 import socket
 import time
 
-from hosts.host_app import TXRXHostApp
+from hosts.host_apps.tx_rx_apps import TXRXHostApp
 
 
 class SilentListenerHostApp(TXRXHostApp):
