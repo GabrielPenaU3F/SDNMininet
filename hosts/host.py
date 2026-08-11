@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+from typing import Type
 
 from core.config.environment import Environment
 from hosts.host_app import HostApp, HostAppContext
@@ -12,13 +13,19 @@ class Host:
         self.process = None
         self.app = None
 
-    #TODO: this should terminate the running process
     def _stop(self):
-        pass
+        if self.process is not None:
+            self.process.terminate()
+            self.wait()
+            self._clear()
 
     @property
     def name(self):
         return self.mn_host.name
+
+    @property
+    def process_running(self):
+        return self.process is not None and self.process.poll() is None
 
     @property
     def ip(self):
@@ -31,11 +38,16 @@ class Host:
         self.process = self.mn_host.popen(*args, **kwargs)
         return self.process
 
-    def launch_app(self, app: HostApp, app_context: HostAppContext, **kwargs):
-        if self.app is not None:
+    def wait(self):
+        if self.process is not None:
+            return self.process.wait()
+        return None
+
+    def launch_app(self, app_cls: Type[type(HostApp)], app_context: HostAppContext, **kwargs):
+        if self.process_running:
             raise RuntimeError(f'Host {self.name} already has an application running')
 
-        command = self._build_app_command(app, **kwargs)
+        command = self._build_app_command(app_cls, **kwargs)
 
         stdout = open(app_context.stdout_path / f'{self.name}.out', 'w')
         stderr = open(app_context.stdout_path / f'{self.name}.err', 'w')
@@ -47,14 +59,13 @@ class Host:
             stdout=stdout,
             stderr=stderr
         )
-        self.app = app
+        self.app = app_cls(**kwargs)
 
         stdout.close()
         stderr.close()
 
-
     @staticmethod
-    def _build_app_command(app, **kwargs):
+    def _build_app_command(app_cls, **kwargs):
         python_path = str(Environment.get_environment().python_path)
         runner_path = str(Environment.get_environment().app_runner_path)
 
@@ -62,10 +73,14 @@ class Host:
             python_path,
             runner_path,
             '--app-module',
-            type(app).__module__,
+            app_cls.__module__,
             '--app-class',
-            type(app).__name__,
+            app_cls.__name__,
             '--app-kwargs',
             json.dumps(kwargs)
         ]
         return command
+
+    def _clear(self):
+        self.process = None
+        self.app = None

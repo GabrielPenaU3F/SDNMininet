@@ -5,9 +5,12 @@ from hosts.host_app import HostApp
 
 class DummyTestHostApp(HostApp):
 
-    @staticmethod
-    def run(**kwargs):
-        print('Running host app')
+    def __init__(self, argument=0):
+        self.argument = argument
+
+    def run(self, **kwargs):
+        print(f'Running host app: {self.argument}')
+
 
 class WriteFileHostApp(HostApp):
 
