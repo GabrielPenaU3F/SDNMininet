@@ -1,37 +1,56 @@
 import socket
 import time
 
-from hosts.host_apps.tx_rx_apps import TXRXHostApp
+from hosts.host_apps.tx_rx_apps import BaseListenerHostApp, BaseSpeakerHostApp
 
 
-class SilentListenerHostApp(TXRXHostApp):
+### MINIMAL LISTENERS
+
+
+class SilentListenerHostApp(BaseListenerHostApp):
 
     def __init__(self, port):
-        self.port = port
-        super().__init__(lambda: '', self.listen)
+        super().__init__(port)
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
     def listen(self):
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        sock.bind(('0.0.0.0', self.port))
+        self.socket.bind(('0.0.0.0', self.port))
 
         print('Receiver started')
 
         while True:
-            data, addr = sock.recvfrom(4096)
-            print(f'Received from {addr}: {data.decode()}')
+            data, addr = self.socket.recvfrom(4096)
+            self._print_on_reception(addr, data)
+
+    @staticmethod
+    def _print_on_reception(sender, data):
+        print(f"Received from {sender}: {data.decode('utf-8')}")
 
 
-class DeafSpeakerHostApp(TXRXHostApp):
+class VerboseSilentListenerHostApp(SilentListenerHostApp):
+
+    @staticmethod
+    def _print_on_reception(sender, data):
+        super()._print_on_reception(sender, data)
+        seq, send_time = data.decode('utf-8').split(',')
+        recv_time = time.monotonic()
+        latency = recv_time - float(send_time)
+        with open('measurements/receiver.log', 'a') as f:
+            f.write(f'{seq},{send_time},{recv_time},{latency}\n')
+
+
+
+### MINIMAL SPEAKERS
+
+
+class DeafSpeakerHostApp(BaseSpeakerHostApp):
 
     def __init__(self, dst_ip, port):
-        self.dst_ip = dst_ip
-        self.port = port
-        super().__init__(self.send, lambda: '')
+        super().__init__(dst_ip, port)
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
     def send(self):
 
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        dst = (self.dst_ip, self.port)
         print('Sender started')
 
         i = 0
@@ -42,7 +61,7 @@ class DeafSpeakerHostApp(TXRXHostApp):
             print(f'Sending: {msg}')
 
             try:
-                sock.sendto(msg.encode(), dst)
+                self._on_send(i, msg)
                 print('OK')
             except Exception as e:
                 print('ERROR:', repr(e))
@@ -50,3 +69,10 @@ class DeafSpeakerHostApp(TXRXHostApp):
 
             i += 1
             time.sleep(1)
+
+    def _on_send(self, seq, message):
+        full_msg = f'Seq={seq},MSG={message}'
+        self.socket.sendto(
+            full_msg.encode('utf-8'),
+            (self.dst_ip, self.port)
+        )

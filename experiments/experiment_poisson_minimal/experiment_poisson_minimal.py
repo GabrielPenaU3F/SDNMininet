@@ -1,29 +1,30 @@
-from core.config.environment import Environment
 from core.controllers.debug_controller import DebugController
 from experiments.experiment import Experiment
+from hosts.host_apps.minimal_apps import VerboseSilentListenerHostApp
+from hosts.host_apps.udp_arrival_speaker_host_app import PoissonArrivalSpeakerHostApp
 from topologies.simple_topology import SimpleTopology
 
 
 class ExperimentPoissonMinimal(Experiment):
 
     def begin(self):
-        sender, receiver = (self.net['h1'], self.net['h2'])
+        sender, receiver = (self.network_mgr.host('h1'), self.network_mgr.host('h2'))
         rate = 10
         seed = 1
 
-        path = Environment.get_environment().host_programs_path
-        sender_script = path / 'poisson_udp_host_program.py'
-        receiver_script = path / 'silent_receiver_host_program.py'
+        # Receiver
+        receiver.launch_app(VerboseSilentListenerHostApp,
+                            self.app_context,
+                            port=100)
 
         # Sender
-        self.program_launcher.launch(sender, script_path=sender_script,
-                                     dst_ip=receiver.IP(),
-                                     port='100',
-                                     rate=rate,
-                                     seed=seed)
+        sender.launch_app(PoissonArrivalSpeakerHostApp,
+                          self.app_context,
+                          dst_ip=receiver.ip,
+                          port=100,
+                          rate=rate,
+                          seed=seed)
 
-        # Receiver
-        self.program_launcher.launch(receiver, script_path=receiver_script, port='100')
 
     @property
     def controller_cls(self):

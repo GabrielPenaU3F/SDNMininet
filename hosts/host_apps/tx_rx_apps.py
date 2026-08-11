@@ -1,5 +1,5 @@
 import threading
-from abc import ABC
+from abc import ABC, abstractmethod
 
 from hosts.host_app import HostApp
 
@@ -26,3 +26,26 @@ class TXRXHostApp(HostApp, ABC):
 
         sender_thread.join()
         receiver_thread.join()
+
+
+class BaseListenerHostApp(TXRXHostApp, ABC):
+
+    def __init__(self, port):
+        super().__init__(lambda: '', self.listen)
+        self.port = port
+
+    @abstractmethod
+    def listen(self):
+        pass
+
+
+class BaseSpeakerHostApp(TXRXHostApp, ABC):
+
+    def __init__(self, dst_ip, port):
+        super().__init__(self.send, lambda: '')
+        self.dst_ip = dst_ip
+        self.port = port
+
+    @abstractmethod
+    def send(self):
+        pass
