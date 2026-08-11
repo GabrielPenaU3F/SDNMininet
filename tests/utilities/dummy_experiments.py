@@ -1,8 +1,7 @@
 import time
 
-from core.controllers.base_controller import BaseController
-from core.controllers.debug_controller import DebugController
 from experiments.experiment import Experiment
+from experiments.experiment_debug.debug_controller import DebugController
 from tests.utilities.dummy_host_apps import WriteFileHostApp
 from topologies.simple_topology import SimpleTopology
 
@@ -18,7 +17,7 @@ class HostAppIntegrationExperiment(Experiment):
 
     @property
     def controller_cls(self):
-        return BaseController
+        return DebugController
 
     @property
     def topology_cls(self):

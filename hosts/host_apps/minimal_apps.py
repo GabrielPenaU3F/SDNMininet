@@ -1,5 +1,6 @@
 import socket
 import time
+from pathlib import Path
 
 from hosts.host_apps.tx_rx_apps import BaseListenerHostApp, BaseSpeakerHostApp
 
@@ -29,15 +30,23 @@ class SilentListenerHostApp(BaseListenerHostApp):
 
 class VerboseSilentListenerHostApp(SilentListenerHostApp):
 
-    @staticmethod
-    def _print_on_reception(sender, data):
+    def __init__(self, port):
+        super().__init__(port)
+        self._clean_resources()
+        self.t0 = time.monotonic()
+
+    def _print_on_reception(self, sender, data):
         super()._print_on_reception(sender, data)
         seq, send_time = data.decode('utf-8').split(',')
-        recv_time = time.monotonic()
+        recv_time = time.monotonic() - self.t0
         latency = recv_time - float(send_time)
         with open('measurements/receiver.log', 'a') as f:
             f.write(f'{seq},{send_time},{recv_time},{latency}\n')
 
+    @staticmethod
+    def _clean_resources():
+        logfile = Path('measurements/receiver.log')
+        logfile.unlink(missing_ok=True)
 
 
 ### MINIMAL SPEAKERS

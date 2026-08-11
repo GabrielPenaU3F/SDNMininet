@@ -1,30 +1,19 @@
 import time
-from pathlib import Path
 
 from ryu.controller import ofp_event
 from ryu.controller.handler import set_ev_cls, MAIN_DISPATCHER
 from ryu.lib.packet import ethernet
 from ryu.lib.packet.packet import Packet
 
-from core.config.environment import Environment
 from core.controllers.base_controller import BaseController
 
 
-class DebugController(BaseController):
+class MonitorController(BaseController):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._test_file = self._open_measurement_file()
         self.last_rx = {}
         self.last_tx = {}
-        self.write_config()
-
-    def _open_measurement_file(self):
-        f = open(self.experiment_root / 'measurements' / 'test_file', 'w', newline='')
-        f.write('Debugging...\n')
-        f.flush()
-        return f
-
 
     @set_ev_cls(
         ofp_event.EventOFPPortStatsReply,
@@ -66,7 +55,3 @@ class DebugController(BaseController):
             f'Ethernet type = {hex(eth.ethertype)}'
         )
         super().packet_in_handler(ev)
-
-    def write_config(self):
-        self._test_file.write(f'SI={str(self.sampling_interval)}\n')
-        self._test_file.flush()

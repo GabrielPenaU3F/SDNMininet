@@ -1,5 +1,5 @@
-from core.controllers.debug_controller import DebugController
 from experiments.experiment import Experiment
+from experiments.experiment_debug.debug_controller import DebugController
 from hosts.host_apps.minimal_apps import SilentListenerHostApp, DeafSpeakerHostApp
 from topologies.simple_topology import SimpleTopology
 

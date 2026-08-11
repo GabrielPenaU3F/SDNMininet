@@ -1,5 +1,6 @@
 import socket
 import time
+from pathlib import Path
 
 from hosts.host_apps.minimal_apps import DeafSpeakerHostApp
 from traffic_models.arrival_processes import ArrivalProcess, PoissonProcess
@@ -29,6 +30,7 @@ class VerboseArrivalProcessSpeakerHostApp(ArrivalProcessSpeakerHostApp):
 
     def __init__(self, process: ArrivalProcess, dst_ip: str, port: int, **kwargs):
         super().__init__(process, dst_ip, port)
+        self._clean_resources()
         self.t0 = time.monotonic()
 
     def _on_send(self, seq, message):
@@ -39,6 +41,10 @@ class VerboseArrivalProcessSpeakerHostApp(ArrivalProcessSpeakerHostApp):
 
         super()._on_send(seq, message)
 
+    @staticmethod
+    def _clean_resources():
+        logfile = Path('measurements/sender.log')
+        logfile.unlink(missing_ok=True)
 
 class PoissonArrivalSpeakerHostApp(VerboseArrivalProcessSpeakerHostApp):
 

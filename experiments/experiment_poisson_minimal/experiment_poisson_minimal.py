@@ -1,4 +1,4 @@
-from core.controllers.debug_controller import DebugController
+from core.controllers.monitor_controller import MonitorController
 from experiments.experiment import Experiment
 from hosts.host_apps.minimal_apps import VerboseSilentListenerHostApp
 from hosts.host_apps.udp_arrival_speaker_host_app import PoissonArrivalSpeakerHostApp
@@ -25,10 +25,9 @@ class ExperimentPoissonMinimal(Experiment):
                           rate=rate,
                           seed=seed)
 
-
     @property
     def controller_cls(self):
-        return DebugController
+        return MonitorController
 
     @property
     def topology_cls(self):

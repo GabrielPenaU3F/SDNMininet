@@ -1,12 +1,8 @@
-import time
 from pathlib import Path
 
-from core.controllers.debug_controller import DebugController
-from experiments.experiment import Experiment
 from experiments.experiment_debug.experiment_debug import ExperimentDebug
 from tests.utilities.dummy_experiments import IntegrationTestExperiment, SamplingIntervalExperiment, \
     HostAppIntegrationExperiment
-from topologies.simple_topology import SimpleTopology
 
 
 class TestExperimentIntegration:
@@ -75,14 +71,12 @@ class TestExperimentIntegration:
 
         for host in ('h1', 'h2'):
             stderr = stdout_dir / f'{host}.err'
+            content = stderr.read_text()
 
-            print(stderr.read_text())
+            assert 'Traceback' not in content, \
+                f'{host} crashed:\n{content}'
 
-            # content = stderr.read_text()
-            # assert 'Traceback' not in content, \
-            #     f'{host} crashed:\n{content}'
-            #
-            # assert 'Network is unreachable' not in content, \
-            #     f'{host} attempted to use the network after shutdown:\n{content}'
-            #
-            # assert content == ''
+            assert 'Network is unreachable' not in content, \
+                f'{host} attempted to use the network after shutdown:\n{content}'
+
+            assert content == ''
