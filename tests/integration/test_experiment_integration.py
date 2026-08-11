@@ -53,11 +53,8 @@ class TestExperimentIntegration:
         experiment = make_experiment(HostAppIntegrationExperiment)
         experiment.execute()
 
-        assert Path(
-            experiment.config.experiment_root
-            / 'measurements'
-            / 'host_program.txt'
-        ).exists()
+        with open(Path(experiment.config.experiment_root / 'logs' / 'logfile.log')) as f:
+            assert f.readline() == 'ok'
 
     def test_experiment_shuts_down_cleanly(self, make_experiment, tmp_path):
         experiment = make_experiment(

@@ -6,7 +6,7 @@ from unittest.mock import Mock, call
 
 from core.config.environment import Environment
 from hosts.host import Host
-from hosts.host_app import HostAppContext
+from hosts.host_apps.host_app import HostAppContext
 from tests.utilities.dummy_host_apps import DummyTestHostApp
 
 

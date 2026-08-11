@@ -32,7 +32,6 @@ class VerboseSilentListenerHostApp(SilentListenerHostApp):
 
     def __init__(self, port):
         super().__init__(port)
-        self._clean_resources()
         self.t0 = time.monotonic()
 
     def _print_on_reception(self, sender, data):
@@ -40,13 +39,12 @@ class VerboseSilentListenerHostApp(SilentListenerHostApp):
         seq, send_time = data.decode('utf-8').split(',')
         recv_time = time.monotonic() - self.t0
         latency = recv_time - float(send_time)
-        with open('measurements/receiver.log', 'a') as f:
+        with open(self.logfile, 'a') as f:
             f.write(f'{seq},{send_time},{recv_time},{latency}\n')
 
-    @staticmethod
-    def _clean_resources():
-        logfile = Path('measurements/receiver.log')
-        logfile.unlink(missing_ok=True)
+    @property
+    def logfile(self):
+        return Path('logs/receiver.log')
 
 
 ### MINIMAL SPEAKERS
@@ -59,9 +57,6 @@ class DeafSpeakerHostApp(BaseSpeakerHostApp):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
     def send(self):
-
-        print('Sender started')
-
         i = 0
         t0 = time.monotonic()
         while True:
@@ -85,3 +80,7 @@ class DeafSpeakerHostApp(BaseSpeakerHostApp):
             full_msg.encode('utf-8'),
             (self.dst_ip, self.port)
         )
+
+    @property
+    def logfile(self):
+        return Path('logs/sender.log')

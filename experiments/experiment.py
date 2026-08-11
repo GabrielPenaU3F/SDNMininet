@@ -6,7 +6,7 @@ import numpy as np
 from core.controller_manager import ControllerManager
 
 from core.network_manager import NetworkManager
-from hosts.host_app import HostAppContext
+from hosts.host_apps.host_app import HostAppContext
 
 
 class Experiment(ABC):

@@ -25,26 +25,25 @@ class ArrivalProcessSpeakerHostApp(DeafSpeakerHostApp):
             self._on_send(seq, 'Lorem ipsum')
             seq += 1
 
+    @property
+    def logfile(self):
+        return Path('logs/sender.log')
+
 
 class VerboseArrivalProcessSpeakerHostApp(ArrivalProcessSpeakerHostApp):
 
     def __init__(self, process: ArrivalProcess, dst_ip: str, port: int, **kwargs):
         super().__init__(process, dst_ip, port)
-        self._clean_resources()
         self.t0 = time.monotonic()
 
     def _on_send(self, seq, message):
 
         payload = f'{seq},{time.monotonic() - self.t0}'
-        with open('measurements/sender.log', 'a') as f:
+        with open(self.logfile, 'a') as f:
             f.write(f'{payload}\n')
 
         super()._on_send(seq, message)
 
-    @staticmethod
-    def _clean_resources():
-        logfile = Path('measurements/sender.log')
-        logfile.unlink(missing_ok=True)
 
 class PoissonArrivalSpeakerHostApp(VerboseArrivalProcessSpeakerHostApp):
 

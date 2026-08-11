@@ -26,3 +26,13 @@ class TestExperimentConfig:
         assert not (tmp_path / 'dummy_experiment' / 'measurements').exists()
         ExperimentConfig('dummy_experiment', experiment_root=tmp_path)
         assert (tmp_path / 'dummy_experiment' / 'measurements').exists()
+
+    def test_creates_stdout_directory(self, args_namespace, tmp_path):
+        assert not (tmp_path / 'dummy_experiment' / 'stdout').exists()
+        ExperimentConfig('dummy_experiment', experiment_root=tmp_path)
+        assert (tmp_path / 'dummy_experiment' / 'stdout').exists()
+
+    def test_creates_logs_directory(self, args_namespace, tmp_path):
+        assert not (tmp_path / 'dummy_experiment' / 'logs').exists()
+        ExperimentConfig('dummy_experiment', experiment_root=tmp_path)
+        assert (tmp_path / 'dummy_experiment' / 'logs').exists()

@@ -1,13 +1,14 @@
 import threading
 from abc import ABC, abstractmethod
 
-from hosts.host_app import HostApp
+from hosts.host_apps.host_app import HostApp
 
 
 class TXRXHostApp(HostApp, ABC):
 
     # Sender and receivers are functions to be defined by subclasses
     def __init__(self, sender, receiver):
+        super().__init__()
         self.sender = sender
         self.receiver = receiver
 

@@ -1,12 +1,12 @@
 import time
 
-from experiments.experiment import Experiment
 from experiments.experiment_debug.debug_controller import DebugController
+from experiments.experiment_debug.experiment_debug import ExperimentDebug
 from tests.utilities.dummy_host_apps import WriteFileHostApp
 from topologies.simple_topology import SimpleTopology
 
 
-class HostAppIntegrationExperiment(Experiment):
+class HostAppIntegrationExperiment(ExperimentDebug):
 
     def begin(self):
         h1 = self.network_mgr.host('h1')
@@ -15,24 +15,8 @@ class HostAppIntegrationExperiment(Experiment):
             self.app_context
         )
 
-    @property
-    def controller_cls(self):
-        return DebugController
 
-    @property
-    def topology_cls(self):
-        return SimpleTopology
-
-
-class IntegrationTestExperiment(Experiment):
-
-    @property
-    def controller_cls(self):
-        return DebugController
-
-    @property
-    def topology_cls(self):
-        return SimpleTopology
+class IntegrationTestExperiment(ExperimentDebug):
 
     def begin(self):
         h1 = self.network_mgr.host('h1')
@@ -40,15 +24,7 @@ class IntegrationTestExperiment(Experiment):
         time.sleep(2)
 
 
-class SamplingIntervalExperiment(Experiment):
-
-    @property
-    def controller_cls(self):
-        return DebugController
-
-    @property
-    def topology_cls(self):
-        return SimpleTopology
+class SamplingIntervalExperiment(ExperimentDebug):
 
     def begin(self):
         time.sleep(0.5)

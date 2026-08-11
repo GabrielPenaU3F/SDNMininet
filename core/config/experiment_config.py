@@ -23,9 +23,12 @@ class ExperimentConfig:
 
         # Root directory initialization
         self.experiment_root = self._calculate_experiment_root(experiment_root, experiment_name)
-        self._initialize_measurements_directory()
-        self._initialize_host_stdout_directory()
+        self._build_directories()
 
+    def _build_directories(self):
+        self._initialize_measurements_directory()
+        self._initialize_stdout_directory()
+        self._initialize_logs_directory()
 
     @classmethod
     def from_args(cls, args):
@@ -50,8 +53,14 @@ class ExperimentConfig:
             exist_ok=True
         )
 
-    def _initialize_host_stdout_directory(self):
+    def _initialize_stdout_directory(self):
         self.stdout_path.mkdir(
+            parents=True,
+            exist_ok=True
+        )
+
+    def _initialize_logs_directory(self):
+        self.logs_path.mkdir(
             parents=True,
             exist_ok=True
         )
@@ -91,3 +100,7 @@ class ExperimentConfig:
     @property
     def stdout_path(self):
         return self.experiment_root / 'stdout'
+
+    @property
+    def logs_path(self):
+        return self.experiment_root / 'logs'

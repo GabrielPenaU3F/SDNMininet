@@ -1,9 +1,8 @@
 import json
-from pathlib import Path
 from typing import Type
 
 from core.config.environment import Environment
-from hosts.host_app import HostApp, HostAppContext
+from hosts.host_apps.host_app import HostApp, HostAppContext
 
 
 class Host:
