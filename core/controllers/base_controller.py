@@ -1,7 +1,9 @@
 import json
 import os
 import socket
+import sys
 import time
+import logging
 from abc import ABC
 from pathlib import Path
 from typing import Any
@@ -10,7 +12,6 @@ from ryu.base import app_manager
 from ryu.controller import ofp_event
 
 from ryu.controller.handler import set_ev_cls, CONFIG_DISPATCHER, MAIN_DISPATCHER
-from ryu.lib import hub
 from ryu.lib.packet import ethernet
 from ryu.lib.packet.packet import Packet
 from ryu.ofproto import ofproto_v1_3
@@ -28,7 +29,7 @@ class BaseController(app_manager.RyuApp, ABC):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.logger.info('Launching Ryu')
+        self._setup_logging()
         self.mac_tables = {}
         self.switches = {}
         self.current_poll_id = 0
@@ -37,14 +38,11 @@ class BaseController(app_manager.RyuApp, ABC):
         self.t0 = time.monotonic()
 
     def start(self):
+        self.logger.info('Launching Ryu')
         super().start()
-        self._set_up_monitor()
         self._signal_startup_complete()
         self.logger.info('Ryu: startup complete')
 
-    def _set_up_monitor(self):
-        self.monitor_thread = hub.spawn(self._monitor)
-        self.logger.info('Monitor online - receiving stats')
 
     # Event Handlers
 
@@ -111,22 +109,6 @@ class BaseController(app_manager.RyuApp, ABC):
         )
         datapath.send_msg(out)
 
-    @staticmethod
-    def request_port_stats(datapath):
-        parser = datapath.ofproto_parser
-        req = parser.OFPPortStatsRequest(datapath)
-        datapath.send_msg(req)
-
-    # Ask for stats
-    def _monitor(self):
-        while True:
-            self.current_poll_id += 1
-            for datapath in self.switches.values():
-                self.switch_poll[datapath.id] = self.current_poll_id
-                self.request_port_stats(datapath)
-
-            hub.sleep(self.sampling_interval)
-
     def _signal_startup_complete(self):
         server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         server.settimeout(30)
@@ -162,3 +144,17 @@ class BaseController(app_manager.RyuApp, ABC):
         self.sampling_interval = cfg['sampling_interval']
         self.seed = cfg['seed']
         self.experiment_root = Path(cfg['experiment_root'])
+
+    def _setup_logging(self):
+
+        # Redirect STDERR to STDOUT
+        root = logging.getLogger()
+        handlers = root.handlers
+        stream_handler = handlers[0]
+        stream_handler.stream = sys.stdout
+
+        # Add file handler - log to file
+        log_path = Path('logs') / 'controller.log'
+        file_handler = logging.FileHandler(log_path)
+        file_handler.setLevel(logging.INFO)
+        self.logger.addHandler(file_handler)

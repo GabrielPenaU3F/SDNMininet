@@ -2,6 +2,7 @@ import time
 
 from ryu.controller import ofp_event
 from ryu.controller.handler import set_ev_cls, MAIN_DISPATCHER
+from ryu.lib import hub
 from ryu.lib.packet import ethernet
 from ryu.lib.packet.packet import Packet
 
@@ -12,8 +13,13 @@ class MonitorController(BaseController):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self._set_up_monitor()
         self.last_rx = {}
         self.last_tx = {}
+
+    def _set_up_monitor(self):
+        self.monitor_thread = hub.spawn(self._monitor)
+        self.logger.info('Monitor online - receiving stats')
 
     @set_ev_cls(
         ofp_event.EventOFPPortStatsReply,
@@ -55,3 +61,19 @@ class MonitorController(BaseController):
             f'Ethernet type = {hex(eth.ethertype)}'
         )
         super().packet_in_handler(ev)
+
+    @staticmethod
+    def request_port_stats(datapath):
+        parser = datapath.ofproto_parser
+        req = parser.OFPPortStatsRequest(datapath)
+        datapath.send_msg(req)
+
+    # Ask for stats
+    def _monitor(self):
+        while True:
+            self.current_poll_id += 1
+            for datapath in self.switches.values():
+                self.switch_poll[datapath.id] = self.current_poll_id
+                self.request_port_stats(datapath)
+
+            hub.sleep(self.sampling_interval)
