@@ -43,8 +43,7 @@ class BaseController(app_manager.RyuApp, ABC):
         self._signal_startup_complete()
         self.logger.info('Ryu: startup complete')
 
-
-    # Event Handlers
+    # ===== Event Handlers
 
     @set_ev_cls(
         ofp_event.EventOFPSwitchFeatures,
@@ -55,7 +54,6 @@ class BaseController(app_manager.RyuApp, ABC):
         self.logger.info(
             f'Switch online: {datapath.id}'
         )
-        # self.logger.info( f"Versión {datapath.ofproto.OFP_VERSION}")
 
         switch_id = datapath.id
         self.switches[switch_id] = datapath # Record switch
@@ -147,6 +145,9 @@ class BaseController(app_manager.RyuApp, ABC):
 
     def _setup_logging(self):
 
+        # Clean old logs
+        self.logfile.unlink(missing_ok=True)
+
         # Redirect STDERR to STDOUT
         root = logging.getLogger()
         handlers = root.handlers
@@ -154,7 +155,10 @@ class BaseController(app_manager.RyuApp, ABC):
         stream_handler.stream = sys.stdout
 
         # Add file handler - log to file
-        log_path = Path('logs') / 'controller.log'
-        file_handler = logging.FileHandler(log_path)
+        file_handler = logging.FileHandler(self.logfile)
         file_handler.setLevel(logging.INFO)
         self.logger.addHandler(file_handler)
+
+    @property
+    def logfile(self):
+        return Path('logs/controller.log')
