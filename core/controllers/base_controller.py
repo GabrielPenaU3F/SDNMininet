@@ -80,11 +80,11 @@ class BaseController(app_manager.RyuApp, ABC):
         else:
             out_port = self.mac_tables[datapath.id][eth.dst]
             install_port_to_mac_rule(datapath, eth.dst, out_port)
+            self.logger.info(f'Forwarding packet to {eth.dst}')
             self.logger.info(
                 f'Installing rule: dst={eth.dst}, out_port={out_port}'
             )
 
-        self.logger.info(f'Forwarding packet to {eth.dst}')
         self.forward_packet(datapath, msg, out_port)
 
     # Methods
