@@ -39,7 +39,7 @@ class ControllerManager:
         proc = subprocess.Popen(
             [
                 ryu_manager,
-                controller_path
+                controller_path,
             ],
             env=env_dict,
             cwd=config.experiment_root,

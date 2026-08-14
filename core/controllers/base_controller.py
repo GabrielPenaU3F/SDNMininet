@@ -1,7 +1,6 @@
 import json
 import os
 import socket
-import sys
 import time
 import logging
 from abc import ABC
@@ -149,11 +148,11 @@ class BaseController(app_manager.RyuApp, ABC):
         # Clean old logs
         self.logfile.unlink(missing_ok=True)
 
-        # Redirect STDERR to STDOUT
+        # Remove old handlers
         root = logging.getLogger()
-        handlers = root.handlers
-        stream_handler = handlers[0]
-        stream_handler.stream = sys.stdout
+        for handler in root.handlers[:]:
+            root.removeHandler(handler)
+            handler.close()
 
         # Add file handler - log to file
         file_handler = logging.FileHandler(self.logfile)
