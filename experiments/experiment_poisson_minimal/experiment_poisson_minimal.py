@@ -1,7 +1,7 @@
 from core.controllers.monitor_controller import MonitorController
 from experiments.experiment import Experiment
 from hosts.host_apps.minimal_apps import VerboseSilentListenerHostApp
-from hosts.host_apps.udp_arrival_speaker_host_app import PoissonArrivalSpeakerHostApp
+from hosts.host_apps.udp_apps.speaker_arrival_apps import PoissonArrivalSpeakerHostApp
 from topologies.simple_topology import SimpleTopology
 
 

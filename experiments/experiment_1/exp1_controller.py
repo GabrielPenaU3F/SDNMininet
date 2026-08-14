@@ -4,10 +4,10 @@ import time
 from ryu.controller import ofp_event
 from ryu.controller.handler import set_ev_cls, MAIN_DISPATCHER
 
-from core.controllers.base_controller import BaseController
+from core.controllers.monitor_controller import MonitorController
 
 
-class Experiment1Controller(BaseController):
+class Experiment1Controller(MonitorController):
 
     def __init__(self):
         super().__init__()
@@ -19,11 +19,7 @@ class Experiment1Controller(BaseController):
 
     @staticmethod
     def _open_traffic_stats_file():
-        return open(
-            'measurements/traffic_stats.csv',
-            'w',
-            newline=''
-        )
+        return open('measurements/traffic_stats.csv', 'w', newline='')
 
     def _setup_csv_header(self):
         self.csv_writer.writerow([

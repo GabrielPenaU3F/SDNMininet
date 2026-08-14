@@ -1,8 +1,8 @@
 import numpy as np
 
-from core.config.environment import Environment
 from experiments.experiment_1.exp1_controller import Experiment1Controller
 from experiments.experiment import Experiment
+from hosts.host_apps.udp_apps.txrx_arrival_apps import PoissonArrivalTXRXHostApp
 from topologies.awad_topology import AwadDDoSTopology
 
 '''
@@ -17,8 +17,10 @@ random rate sampled from a U[30, 60] distribution.
 class Experiment1(Experiment):
 
     def _begin(self):
-        hosts = [self.net['h1'], self.net['h2'], self.net['h3'], self.net['h4'],
-                 self.net['h5'], self.net['h6'], self.net['h7'], self.net['h8']]
+        hosts = [self.network_mgr.host('h1'), self.network_mgr.host('h2'),
+                 self.network_mgr.host('h3'), self.network_mgr.host('h4'),
+                 self.network_mgr.host('h5'), self.network_mgr.host('h6'),
+                 self.network_mgr.host('h7'), self.network_mgr.host('h8')]
         rates = self.rng.uniform(0, 10, 8)
         receivers = set(hosts.copy())
 
@@ -30,17 +32,15 @@ class Experiment1(Experiment):
 
         for i in range(8):
             h = hosts[i]
-            script = (Environment.get_environment().host_programs_path /
-                      'poisson_udp_host_program.py')
             candidates = [r for r in receivers if r is not h]
             target = self.rng.choice(candidates)
             receivers.remove(target)
-            # print(h.name, target.IP(), rates[i], host_seeds[i])
-            self.program_launcher.launch(h, script_path=script,
-                                         dst_ip=target.IP(),
-                                         port='100',
-                                         rate=rates[i],
-                                         seed=host_seeds[i])
+            h.launch_app(PoissonArrivalTXRXHostApp,
+                         self.app_context,
+                         dst_ip=target.ip,
+                         port=100,
+                         rate=rates[i],
+                         seed=host_seeds[i])
 
     @property
     def controller_cls(self):
