@@ -19,7 +19,7 @@ class ArrivalProcessSpeakerHostApp(DeafSpeakerHostApp):
         while True:
             dt = self.process.interarrival_time()
             time.sleep(dt)
-            payload = f'SEQ: {seq} - Time:{time.monotonic() - t0}'
+            payload = f'{seq},{time.monotonic() - t0}'
             with open(self.logfile, 'a') as f:
                 f.write(f'{payload}\n')
             self._on_send(payload)

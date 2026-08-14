@@ -15,10 +15,9 @@ class SilentListenerHostApp(BaseListenerHostApp):
 
     def listen(self):
         self.socket.bind(('0.0.0.0', self.port))
+        print('Listening', flush=True)
         while True:
-            print('Awaiting packet', flush=True)
             data, addr = self.socket.recvfrom(4096)
-            print('Packet received', flush=True)
             self._print_on_reception(addr, data)
 
     @staticmethod
@@ -38,7 +37,7 @@ class VerboseSilentListenerHostApp(SilentListenerHostApp):
         recv_time = time.monotonic() - self.t0
         latency = recv_time - float(send_time)
         with open(self.logfile, 'a') as f:
-            f.write(f'{seq},{send_time},{recv_time},{latency}\n')
+            f.write(f'SEQ: {seq}, SENT AT: {send_time}, RECV AT: {recv_time}, LAG: {latency}\n')
 
     @property
     def logfile(self):
@@ -58,7 +57,7 @@ class DeafSpeakerHostApp(BaseSpeakerHostApp):
         i = 0
         t0 = time.monotonic()
         while True:
-            payload = f'SEQ: {i} - Time:{time.monotonic() - t0}'
+            payload = f'{i},{time.monotonic() - t0}'
             self._on_send(payload)
             print('Packet sent', flush=True)
             i += 1
