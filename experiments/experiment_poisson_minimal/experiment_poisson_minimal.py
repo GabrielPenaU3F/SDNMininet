@@ -9,8 +9,8 @@ class ExperimentPoissonMinimal(Experiment):
 
     def _begin(self):
         sender, receiver = (self.network_mgr.host('h1'), self.network_mgr.host('h2'))
+        seed = self.config.seed
         rate = 10
-        seed = 1
 
         # Receiver
         receiver.launch_app(VerboseSilentListenerHostApp,
