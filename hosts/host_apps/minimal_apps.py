@@ -7,7 +7,6 @@ from hosts.host_apps.tx_rx_apps import BaseListenerHostApp, BaseSpeakerHostApp
 
 ### MINIMAL LISTENERS
 
-
 class SilentListenerHostApp(BaseListenerHostApp):
 
     def __init__(self, port):
@@ -16,11 +15,10 @@ class SilentListenerHostApp(BaseListenerHostApp):
 
     def listen(self):
         self.socket.bind(('0.0.0.0', self.port))
-
-        print('Receiver started')
-
         while True:
+            print('Awaiting packet', flush=True)
             data, addr = self.socket.recvfrom(4096)
+            print('Packet received', flush=True)
             self._print_on_reception(addr, data)
 
     @staticmethod
@@ -60,24 +58,19 @@ class DeafSpeakerHostApp(BaseSpeakerHostApp):
         i = 0
         t0 = time.monotonic()
         while True:
-            msg = f'packet {i}'
-            print(f'Time: {time.monotonic() - t0}')
-            print(f'Sending: {msg}')
-
-            try:
-                self._on_send(i, msg)
-                print('OK')
-            except Exception as e:
-                print('ERROR:', repr(e))
-                raise
-
+            payload = f'SEQ: {i} - Time:{time.monotonic() - t0}'
+            self._on_send(payload)
+            print('Packet sent', flush=True)
             i += 1
-            time.sleep(1)
+            time.sleep(self._idle_time())
 
-    def _on_send(self, seq, message):
-        full_msg = f'Seq={seq},MSG={message}'
+    @staticmethod
+    def _idle_time():
+        return 1
+
+    def _on_send(self, payload):
         self.socket.sendto(
-            full_msg.encode('utf-8'),
+            payload.encode('utf-8'),
             (self.dst_ip, self.port)
         )
 

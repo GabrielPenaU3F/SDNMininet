@@ -30,12 +30,15 @@ class Host:
     def ip(self):
         return self.mn_host.IP()
 
+    @property
+    def mac(self):
+        return self.mn_host.MAC()
+
     def cmd(self, *args, **kwargs):
         return self.mn_host.cmd(*args, **kwargs)
 
     def popen(self, *args, **kwargs):
-        self.process = self.mn_host.popen(*args, **kwargs)
-        return self.process
+        return self.mn_host.popen(*args, **kwargs)
 
     def wait(self):
         if self.process is not None:

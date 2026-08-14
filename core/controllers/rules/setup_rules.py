@@ -1,8 +1,11 @@
+from extras.constants import ETH_IPV6
+
+
 def install_send_everything_to_controller_rule(datapath):
     openflow_constants = datapath.ofproto
     openflow_parser = datapath.ofproto_parser
 
-    # Minima prioridad - coincidir con tod0
+    # Minimum priority - match everything
     match = openflow_parser.OFPMatch()
 
     actions = [
@@ -27,18 +30,17 @@ def install_send_everything_to_controller_rule(datapath):
 
     datapath.send_msg(mod)
 
-
 def install_discard_ipv6_traffic_rule(datapath):
     openflow_parser = datapath.ofproto_parser
 
-    # Coincidir los paquetes de IPv6
+    # Match IPv6 packets
     match_ipv6 = openflow_parser.OFPMatch(
-        eth_type=0x86dd
+        eth_type=ETH_IPV6
     )
 
     inst = []
 
-    # Con alta prioridad, no hacemos nada con los paquetes ipv6
+    # Drop IPv6 packets with high priority
     mod = openflow_parser.OFPFlowMod(
         datapath=datapath,
         priority=10,

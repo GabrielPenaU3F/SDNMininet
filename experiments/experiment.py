@@ -25,7 +25,7 @@ class Experiment(ABC):
         with self.config.config_context():
             self.deploy_infrastructure()
             try:
-                self.begin()
+                self._begin()
                 self._wait_until_finished()
             finally:
                 self.shutdown()
@@ -39,7 +39,9 @@ class Experiment(ABC):
         self.controller_mgr.stop()
 
     def _wait_until_finished(self):
-        deadline = time.monotonic() + self.config.duration
+        if self.config.duration > 0:
+            deadline = time.monotonic() + self.config.duration
+        else: deadline = np.inf
 
         while time.monotonic() < deadline:
             time.sleep(0.5)
@@ -47,7 +49,7 @@ class Experiment(ABC):
     # === To be implemented by each subclass ===
 
     @abstractmethod
-    def begin(self):
+    def _begin(self):
         pass
 
     @property

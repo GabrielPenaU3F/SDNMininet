@@ -1,14 +1,13 @@
 import time
 
-from experiments.experiment_debug.debug_controller import DebugController
 from experiments.experiment_debug.experiment_debug import ExperimentDebug
-from tests.utilities.dummy_host_apps import WriteFileHostApp
-from topologies.simple_topology import SimpleTopology
+from hosts.host_apps.minimal_apps import SilentListenerHostApp
+from tests.utilities.dummy_host_apps import WriteFileHostApp, FastDeafSpeakerTestHostApp
 
 
 class HostAppIntegrationExperiment(ExperimentDebug):
 
-    def begin(self):
+    def _begin(self):
         h1 = self.network_mgr.host('h1')
         h1.launch_app(
             WriteFileHostApp,
@@ -18,7 +17,7 @@ class HostAppIntegrationExperiment(ExperimentDebug):
 
 class IntegrationTestExperiment(ExperimentDebug):
 
-    def begin(self):
+    def _begin(self):
         h1 = self.network_mgr.host('h1')
         h1.cmd('ping -c 3 h2')
         time.sleep(2)
@@ -26,5 +25,25 @@ class IntegrationTestExperiment(ExperimentDebug):
 
 class SamplingIntervalExperiment(ExperimentDebug):
 
-    def begin(self):
+    def _begin(self):
         time.sleep(0.5)
+
+
+class MacLearningIntegrationExperiment(ExperimentDebug):
+
+    def _begin(self):
+        h1 = self.network_mgr.host('h1')
+        h2 = self.network_mgr.host('h2')
+
+        h2.launch_app(
+            SilentListenerHostApp,
+            self.app_context,
+            port=100
+        )
+
+        h1.launch_app(
+            FastDeafSpeakerTestHostApp,
+            self.app_context,
+            dst_ip=h2.ip,
+            port=100
+        )

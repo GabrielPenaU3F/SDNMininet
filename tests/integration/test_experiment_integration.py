@@ -10,13 +10,8 @@ class TestExperimentIntegration:
     def test_experiment_deploys_real_infrastructure(self, make_experiment, tmp_path):
         experiment = make_experiment(IntegrationTestExperiment)
         experiment.execute()
-        file = Path(tmp_path / 'dummy_experiment' / 'measurements' / 'test_file')
-
+        file = Path(tmp_path / 'dummy_experiment' / 'logs' / 'controller.log')
         assert file.exists()
-
-        with open(str(file), 'r') as f:
-            line = f.readline()
-        assert line.rstrip() == 'Debugging...'
 
     def test_controller_receives_sampling_interval(self, make_experiment, tmp_path):
         experiment = make_experiment(
@@ -27,11 +22,10 @@ class TestExperimentIntegration:
 
         experiment.execute()
 
-        file = tmp_path / 'dummy_experiment' / 'measurements' / 'test_file'
+        file = tmp_path / 'dummy_experiment' / 'logs' / 'controller.log'
         with open(str(file), 'r') as f:
-            _ = f.readline()
-            line_2 = f.readline()
-        assert line_2.rstrip() == 'SI=0.05'
+            line_1 = f.readline()
+        assert line_1.rstrip() == 'SI=0.05'
 
     def test_experiment_hosts_redirect_console_outputs(self, make_experiment, tmp_path):
         experiment = make_experiment(

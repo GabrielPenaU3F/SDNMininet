@@ -49,7 +49,6 @@ class NetworkManager:
 
     # noinspection PyProtectedMember
     def _stop_hosts(self):
-        # TODO: stop every process running inside hosts.
         for host in self._hosts.values():
             host._stop()
 

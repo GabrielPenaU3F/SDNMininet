@@ -69,7 +69,6 @@ class ControllerManager:
 
             time.sleep(1)
 
-
     def _is_process_alive(self) -> bool:
         return self._process.poll() is None
 

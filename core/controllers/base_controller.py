@@ -82,12 +82,13 @@ class BaseController(app_manager.RyuApp, ABC):
             out_port = self.mac_tables[datapath.id][eth.dst]
             self.logger.info(f'Forwarding packet to {eth.dst}')
             install_port_to_mac_rule(datapath, eth.dst, out_port)
-            self.logger.info(f'Installing rule')
+            self.logger.info(
+                f'Installing rule: dst={eth.dst}, out_port={out_port}'
+            )
 
         self.forward_packet(datapath, msg, out_port)
 
     # Methods
-
     @staticmethod
     def forward_packet(datapath, msg, port) -> Any:
         openflow_parser = datapath.ofproto_parser

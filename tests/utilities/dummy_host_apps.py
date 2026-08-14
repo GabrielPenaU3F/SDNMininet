@@ -1,6 +1,8 @@
+import time
 from pathlib import Path
 
 from hosts.host_apps.host_app import HostApp
+from hosts.host_apps.minimal_apps import DeafSpeakerHostApp
 
 
 class DummyTestHostApp(HostApp):
@@ -19,3 +21,10 @@ class WriteFileHostApp(HostApp):
     def run(**kwargs):
         Path('logs').mkdir(exist_ok=True)
         Path('logs/logfile.log').write_text('ok')
+
+
+class FastDeafSpeakerTestHostApp(DeafSpeakerHostApp):
+
+    @staticmethod
+    def _idle_time():
+        return 0.2

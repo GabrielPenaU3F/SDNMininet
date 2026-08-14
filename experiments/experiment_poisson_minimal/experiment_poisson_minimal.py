@@ -7,7 +7,7 @@ from topologies.simple_topology import SimpleTopology
 
 class ExperimentPoissonMinimal(Experiment):
 
-    def begin(self):
+    def _begin(self):
         sender, receiver = (self.network_mgr.host('h1'), self.network_mgr.host('h2'))
         rate = 10
         seed = 1

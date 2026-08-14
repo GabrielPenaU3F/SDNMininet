@@ -49,6 +49,10 @@ class MonitorController(BaseController):
             self.last_rx[port] = rx_packets
             self.last_tx[port] = tx_packets
 
+    @set_ev_cls(
+        ofp_event.EventOFPPacketIn,
+        MAIN_DISPATCHER
+    )
     def packet_in_handler(self, ev):
         pkt = Packet(ev.msg.data)
         eth = pkt.get_protocol(ethernet.ethernet)
