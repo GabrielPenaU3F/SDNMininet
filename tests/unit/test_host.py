@@ -15,9 +15,13 @@ def dummy_mn_host():
     mn_host = Mock()
     mn_host.name = 'h1'
     mn_host.IP.return_value = '127.0.0.1'
-    process = Mock()
-    process.poll.return_value = None
-    mn_host.popen.return_value = process
+
+    def create_process(*args, **kwargs):
+        process = Mock()
+        process.poll.return_value = None
+        return process
+
+    mn_host.popen.side_effect = create_process
     return mn_host
 
 @pytest.fixture
@@ -132,21 +136,17 @@ class TestStop:
         example_host.launch_app(DummyTestHostApp, example_context)
         example_host._stop()
 
-        assert example_host.app is None
         assert example_host.process is None
         assert not example_host.process_running
 
 
 class TestLaunchApp:
 
-    def test_launch_stores_app_and_process(self, example_host, example_context):
+    def test_launch_stores_process(self, example_host, example_context):
         example_host.launch_app(DummyTestHostApp,
                                 example_context,
                                 argument=1)
-
-        assert type(example_host.app) is DummyTestHostApp
-        assert example_host.app.argument == 1
-        assert example_host.process is example_host.mn_host.popen.return_value
+        assert example_host.process is not None
 
     def test_launch_invokes_popen_with_expected_command(self, example_host, example_context):
         example_host.launch_app(
@@ -193,14 +193,21 @@ class TestLaunchApp:
                                 example_context,
                                 argument=1)
 
-        assert example_host.app.argument == 1
+        first_process = example_host.process
+        assert first_process is not None
 
         example_host._stop()
+
+        first_process.terminate.assert_called_once()
+        first_process.wait.assert_called_once()
+
         example_host.launch_app(DummyTestHostApp,
                                 example_context,
                                 argument=2)
 
-        assert example_host.app.argument == 2
+        second_process = example_host.process
+        assert second_process is not None
+        assert second_process is not first_process
 
     # noinspection PyTypeChecker
     def test_launch_app_fails_if_an_application_is_already_running(self, example_host, example_context):

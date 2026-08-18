@@ -10,7 +10,6 @@ class Host:
     def __init__(self, mn_host):
         self.mn_host = mn_host
         self.process = None
-        self.app = None
 
     def _stop(self):
         if self.process is not None:
@@ -61,7 +60,6 @@ class Host:
             stdout=stdout,
             stderr=stderr
         )
-        self.app = app_cls(**kwargs)
 
         stdout.close()
         stderr.close()
@@ -85,4 +83,3 @@ class Host:
 
     def _clear(self):
         self.process = None
-        self.app = None
