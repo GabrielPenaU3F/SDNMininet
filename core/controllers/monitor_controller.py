@@ -37,17 +37,17 @@ class MonitorController(BaseController):
             port = stat.port_no
             rx_packets = stat.rx_packets
             tx_packets = stat.tx_packets
-            if port not in self.last_rx.keys():
-                self.last_rx[port] = rx_packets
+            key = (switch_id, port)
 
-            if port not in self.last_tx.keys():
-                self.last_tx[port] = tx_packets
+            previous_rx = self.last_rx.get(key, rx_packets)
+            previous_tx = self.last_tx.get(key, tx_packets)
 
             self.logger.info(f'Poll ID: {poll_id} -- Time: {time.monotonic() - self.t0:.6f} -- Port: {port}'
-                  f' -- RX Packets: {rx_packets - self.last_rx.get(port)}'
-                  f' -- TX Packets: {tx_packets - self.last_tx.get(port)}')
-            self.last_rx[port] = rx_packets
-            self.last_tx[port] = tx_packets
+                  f' -- RX Packets: {rx_packets - previous_rx}'
+                  f' -- TX Packets: {tx_packets - previous_tx}')
+
+            self.last_rx[key] = rx_packets
+            self.last_tx[key] = tx_packets
 
     @set_ev_cls(
         ofp_event.EventOFPPacketIn,
