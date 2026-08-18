@@ -44,6 +44,8 @@ class MonitorController(BaseController):
         datapath.send_msg(req)
 
 
+# ==== Handlers
+
     @set_ev_cls(
         ofp_event.EventOFPPortStatsReply,
         MAIN_DISPATCHER

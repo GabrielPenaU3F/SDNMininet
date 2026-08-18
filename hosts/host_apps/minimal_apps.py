@@ -22,7 +22,7 @@ class SilentListenerHostApp(BaseListenerHostApp):
 
     @staticmethod
     def _print_on_reception(sender, data):
-        print(f"Received from {sender}: {data.decode('utf-8')}")
+        print(f"Received from {sender}: {data.decode('utf-8')}", flush=True)
 
 
 class VerboseSilentListenerHostApp(SilentListenerHostApp):
