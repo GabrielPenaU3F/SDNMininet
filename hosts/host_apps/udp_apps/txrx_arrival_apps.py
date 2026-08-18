@@ -31,7 +31,7 @@ class ArrivalProcessTXRXHostApp(TXRXHostApp):
     def listen(self):
         self.rx_socket.bind(('0.0.0.0', self.port))
         while True:
-            data, addr = self.tx_socket.recvfrom(4096)
+            data, addr = self.rx_socket.recvfrom(4096)
 
 
 class PoissonArrivalTXRXHostApp(ArrivalProcessTXRXHostApp):

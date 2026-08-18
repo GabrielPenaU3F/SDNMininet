@@ -39,7 +39,7 @@ class Experiment(ABC):
         self.controller_mgr.stop()
 
     def _wait_until_finished(self):
-        if self.config.duration > 0:
+        if self.config.duration >= 0:
             deadline = time.monotonic() + self.config.duration
         else: deadline = np.inf
 
