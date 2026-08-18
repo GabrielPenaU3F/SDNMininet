@@ -23,8 +23,8 @@ class Experiment(ABC):
 
     def execute(self):
         with self.config.config_context():
-            self.deploy_infrastructure()
             try:
+                self.deploy_infrastructure()
                 self._begin()
                 self._wait_until_finished()
             finally:

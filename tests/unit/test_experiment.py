@@ -70,6 +70,15 @@ class TestExperiment:
         dummy_experiment.shutdown()
         dummy_experiment.controller_mgr.stop.assert_called_once()
 
+    def test_execute_shuts_down_if_deploy_infrastructure_fails(self, dummy_experiment):
+        dummy_experiment.deploy_infrastructure = Mock(side_effect=RuntimeError('Deploy failure'))
+        dummy_experiment.shutdown = Mock()
+
+        with pytest.raises(RuntimeError, match='Deploy failure'):
+            dummy_experiment.execute()
+
+        dummy_experiment.shutdown.assert_called_once()
+
 
 class TestWaitUntilFinished:
 

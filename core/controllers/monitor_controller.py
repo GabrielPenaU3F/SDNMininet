@@ -8,18 +8,41 @@ from ryu.lib.packet.packet import Packet
 
 from core.controllers.base_controller import BaseController
 
+'''
+MonitorController makes polls every sampling_interval seconds
+A poll is a round of solicitudes, emitted by the controller. 
+Each answer is an independent observation, uniquely identified by the triplet
+(poll_id, switch_id, port_no), paired with its reception time.
+'''
 
 class MonitorController(BaseController):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._set_up_monitor()
+        self.current_poll_id = 0
         self.last_rx = {}
         self.last_tx = {}
 
     def _set_up_monitor(self):
         self.monitor_thread = hub.spawn(self._monitor)
         self.logger.info('Monitor online - receiving stats')
+
+    # Ask for stats
+    def _monitor(self):
+        while True:
+            self.current_poll_id += 1
+            for datapath in self.switches.values():
+                self.request_port_stats(datapath)
+
+            hub.sleep(self.sampling_interval)
+
+    @staticmethod
+    def request_port_stats(datapath):
+        parser = datapath.ofproto_parser
+        req = parser.OFPPortStatsRequest(datapath)
+        datapath.send_msg(req)
+
 
     @set_ev_cls(
         ofp_event.EventOFPPortStatsReply,
@@ -33,12 +56,13 @@ class MonitorController(BaseController):
             if stat.port_no > 0xffffff00:
                 continue
 
-            poll_id = self.switch_poll[switch_id]
+            poll_id = self.current_poll_id
             port = stat.port_no
             rx_packets = stat.rx_packets
             tx_packets = stat.tx_packets
             key = (switch_id, port)
 
+            # Defaults to current packets if its the first poll
             previous_rx = self.last_rx.get(key, rx_packets)
             previous_tx = self.last_tx.get(key, tx_packets)
 
@@ -65,19 +89,3 @@ class MonitorController(BaseController):
             f'Ethernet type = {hex(eth.ethertype)}'
         )
         super().packet_in_handler(ev)
-
-    @staticmethod
-    def request_port_stats(datapath):
-        parser = datapath.ofproto_parser
-        req = parser.OFPPortStatsRequest(datapath)
-        datapath.send_msg(req)
-
-    # Ask for stats
-    def _monitor(self):
-        while True:
-            self.current_poll_id += 1
-            for datapath in self.switches.values():
-                self.switch_poll[datapath.id] = self.current_poll_id
-                self.request_port_stats(datapath)
-
-            hub.sleep(self.sampling_interval)

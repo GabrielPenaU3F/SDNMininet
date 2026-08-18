@@ -19,7 +19,12 @@ class ControllerManager:
         if self._process:
             raise RuntimeError('Controller already running. Terminate before re-launching')
         self._process = self._launch_controller(config)
-        self._wait_until_ready()
+
+        try:
+            self._wait_until_ready()
+        except Exception:
+            self.stop()
+            raise
 
     def stop(self):
         if self._process:

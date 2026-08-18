@@ -31,8 +31,6 @@ class BaseController(app_manager.RyuApp, ABC):
         self._setup_logging()
         self.mac_tables = {}
         self.switches = {}
-        self.current_poll_id = 0
-        self.switch_poll = {}
         self._load_config()
         self.t0 = time.monotonic()
 

@@ -83,6 +83,17 @@ class TestStart:
         with pytest.raises(RuntimeError):
             controller_manager.start(Mock())
 
+    def test_start_stops_controller_if_wait_until_ready_fails(self, controller_manager):
+        process = Mock()
+        controller_manager._launch_controller = Mock(return_value=process)
+        controller_manager._wait_until_ready = Mock(side_effect=TimeoutError)
+
+        with pytest.raises(TimeoutError):
+            controller_manager.start(Mock())
+
+        process.terminate.assert_called_once()
+        process.wait.assert_called_once()
+
 
 class TestWaitUntilReady:
 
