@@ -1,6 +1,6 @@
 import numpy as np
 
-from experiments.experiment_1.exp1_controller import Experiment1Controller
+from core.controllers.csv_traffic_stats_controller import CSVTrafficStatsController
 from experiments.experiment import Experiment
 from hosts.host_apps.udp_apps.txrx_arrival_apps import PoissonArrivalTXRXHostApp
 from topologies.awad_topology import AwadDDoSTopology
@@ -44,7 +44,7 @@ class Experiment1(Experiment):
 
     @property
     def controller_cls(self):
-        return Experiment1Controller
+        return CSVTrafficStatsController
 
     @property
     def topology_cls(self):

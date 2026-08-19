@@ -1,5 +1,6 @@
 import csv
 import time
+from pathlib import Path
 
 from ryu.controller import ofp_event
 from ryu.controller.handler import set_ev_cls, MAIN_DISPATCHER
@@ -7,7 +8,7 @@ from ryu.controller.handler import set_ev_cls, MAIN_DISPATCHER
 from core.controllers.monitor_controller import MonitorController
 
 
-class Experiment1Controller(MonitorController):
+class CSVTrafficStatsController(MonitorController):
 
     def __init__(self):
         super().__init__()
@@ -17,9 +18,16 @@ class Experiment1Controller(MonitorController):
         self.csv_writer = csv.writer(self._traffic_stats_csv)
         self._setup_csv_header()
 
-    @staticmethod
-    def _open_traffic_stats_file():
-        return open('measurements/traffic_stats.csv', 'w', newline='')
+    # ==== Properties
+
+    @property
+    def stats_file(self):
+        return Path('measurements/traffic_stats.csv')
+
+    # ==== Methods
+
+    def _open_traffic_stats_file(self):
+        return open(self.stats_file, 'w', newline='')
 
     def _setup_csv_header(self):
         self.csv_writer.writerow([
@@ -33,6 +41,9 @@ class Experiment1Controller(MonitorController):
             # "tx_bytes"
         ])
 
+
+    # ==== Handlers
+
     @set_ev_cls(
         ofp_event.EventOFPPortStatsReply,
         MAIN_DISPATCHER
@@ -40,20 +51,21 @@ class Experiment1Controller(MonitorController):
     def port_stats_reply_handler(self, ev):
         body = ev.msg.body
         switch_id = ev.msg.datapath.id
+
         for stat in body:
             if stat.port_no > 0xffffff00:
                 continue
 
-            poll_id = self.switch_poll[switch_id]
-            self.csv_writer.writerow([
+            poll_id = self.current_poll_id
+
+            row = [
                 poll_id,
                 f'{time.monotonic() - self.t0:.6f}',
                 switch_id,
                 stat.port_no,
                 stat.rx_packets,
-                # stat.tx_packets,
                 stat.rx_bytes,
-                # stat.tx_bytes
-            ])
+            ]
+            self.csv_writer.writerow(row)
 
         self._traffic_stats_csv.flush()
