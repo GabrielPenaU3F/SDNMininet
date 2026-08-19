@@ -8,7 +8,7 @@ from ryu.controller.handler import set_ev_cls, MAIN_DISPATCHER
 from core.controllers.monitor_controller import MonitorController
 
 
-class CSVTrafficStatsController(MonitorController):
+class TrafficStatsCSVController(MonitorController):
 
     def __init__(self):
         super().__init__()

@@ -1,5 +1,5 @@
 
-from core.controllers.csv_traffic_stats_controller import CSVTrafficStatsController
+from core.controllers.traffic_stats_csv_controller import TrafficStatsCSVController
 from experiments.experiment import Experiment
 from hosts.host_apps.minimal_apps import SilentListenerHostApp
 from hosts.host_apps.udp_apps.speaker_arrival_apps import PoissonArrivalSpeakerHostApp
@@ -35,7 +35,7 @@ class Experiment0(Experiment):
 
     @property
     def controller_cls(self):
-        return CSVTrafficStatsController
+        return TrafficStatsCSVController
 
     @property
     def topology_cls(self):

@@ -13,15 +13,26 @@ class ArrivalProcessSpeakerHostApp(DeafSpeakerHostApp):
         self.process = process
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
+    '''
+        Careful: need to compare vs absolute deadlines 
+        to void accumulating scheduler delays
+    '''
+
     def send(self):
         seq = 0
         t0 = time.monotonic()
+        ideal_t = 0.0
         while True:
             dt = self.process.interarrival_time()
-            time.sleep(dt)
-            payload = f'{seq},{time.monotonic() - t0}'
-            with open(self.logfile, 'a') as f:
-                f.write(f'{payload}\n')
+            ideal_t += dt
+            sleep_time = ideal_t - (time.monotonic() - t0)
+            if sleep_time > 0:
+                time.sleep(sleep_time)
+
+            t = time.monotonic()
+            real_t = t - t0
+            error = real_t - ideal_t
+            payload = f'{seq},{ideal_t},{real_t},{error}'
             self._on_send(payload)
             seq += 1
 
